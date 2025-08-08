@@ -29,6 +29,18 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'role' => ['required', 'string', 'in:student,faculty,admin'],
+        ];
+    }
+
+    /**
+     * Get custom validation messages
+     */
+    public function messages(): array
+    {
+        return [
+            'role.required' => 'Please select your role.',
+            'role.in' => 'Please select a valid role.',
         ];
     }
 
@@ -41,11 +53,22 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // First, try to authenticate with email and password
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // Check if the authenticated user has the selected role
+        $user = Auth::user();
+        if ($user->role !== $this->input('role')) {
+            Auth::logout();
+            
+            throw ValidationException::withMessages([
+                'role' => 'The selected role does not match your account type.',
             ]);
         }
 
