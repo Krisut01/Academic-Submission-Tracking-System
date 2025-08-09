@@ -20,17 +20,68 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
         .form-btn {
-            background: linear-gradient(135deg, var(--bg-from), var(--bg-to));
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+            border: none !important;
+            text-decoration: none !important;
+            outline: none !important;
+            position: relative;
+            overflow: hidden;
         }
         .form-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.15);
         }
-        .registration { --bg-from: #3B82F6; --bg-to: #1D4ED8; }
-        .clearance { --bg-from: #10B981; --bg-to: #059669; }
-        .evaluation { --bg-from: #8B5CF6; --bg-to: #7C3AED; }
+        .form-btn:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Solid color backgrounds for each button type */
+        .registration {
+            background-color: #3B82F6 !important;
+        }
+        .registration:hover {
+            background-color: #1D4ED8 !important;
+        }
+        .clearance {
+            background-color: #10B981 !important;
+        }
+        .clearance:hover {
+            background-color: #059669 !important;
+        }
+        .evaluation {
+            background-color: #8B5CF6 !important;
+        }
+        .evaluation:hover {
+            background-color: #7C3AED !important;
+        }
+        
+        /* Remove any potential skeleton/loading states */
+        .form-card * {
+            background-image: none !important;
+        }
+        
+        /* Ensure no pseudo-elements create white lines */
+        .form-card::before,
+        .form-card::after,
+        .form-card *::before,
+        .form-card *::after {
+            display: none !important;
+        }
+        
+        /* Ensure card content is clean */
+        .card-content {
+            background: transparent !important;
+        }
+        
+        /* Remove any browser default styling that might cause white lines */
+        .form-card h3,
+        .form-card p,
+        .form-card div {
+            background: transparent !important;
+            border: none !important;
+        }
     </style>
 
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
@@ -92,7 +143,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
                 <!-- Registration Form -->
                 <div class="form-card bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="p-8">
+                    <div class="p-8 card-content">
                         <!-- Enhanced Header -->
                         <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg mb-6 mx-auto">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +195,7 @@
 
                 <!-- Clearance Form -->
                 <div class="form-card bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="p-8">
+                    <div class="p-8 card-content">
                         <!-- Enhanced Header -->
                         <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-lg mb-6 mx-auto">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +247,7 @@
 
                 <!-- Evaluation Form -->
                 <div class="form-card bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="p-8">
+                    <div class="p-8 card-content">
                         <!-- Enhanced Header -->
                         <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl shadow-lg mb-6 mx-auto">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

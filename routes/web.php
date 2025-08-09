@@ -15,6 +15,11 @@ Route::get('/dashboard', function () {
     $user = Auth::user();
     $role = $user->role;
     
+    // Redirect faculty users to their specific dashboard
+    if ($role === 'faculty') {
+        return redirect()->route('faculty.dashboard');
+    }
+    
     // Initialize dashboard data
     $dashboardData = [];
     
@@ -45,25 +50,6 @@ Route::get('/dashboard', function () {
                     ->orWhere('status', 'approved')
                     ->orderBy('created_at', 'desc')
                     ->first() : null
-            ];
-        } elseif ($role === 'faculty') {
-            // Get real faculty data from database with safety checks
-            $hasThesisDocuments = Schema::hasTable('thesis_documents');
-            $hasUsers = Schema::hasTable('users');
-            
-            $dashboardData = [
-                'pending_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')->count() : 0,
-                'completed_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('reviewed_by', $user->id)->count() : 0,
-                'assigned_students' => $hasUsers && $hasThesisDocuments ? \App\Models\User::where('role', 'student')
-                    ->whereHas('thesisDocuments', function($q) use ($user) {
-                        $q->where('reviewed_by', $user->id);
-                    })->count() : 0,
-                'urgent_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')
-                    ->where('created_at', '<=', now()->subDays(5))->count() : 0,
-                'recent_submissions' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')
-                    ->with('user')->orderBy('created_at', 'desc')->take(5)->get() : collect(),
-                'avg_review_time' => 2.5, // This would need more complex calculation
-                'unread_notifications' => Schema::hasTable('notifications') ? $user->unreadNotifications()->count() : 0,
             ];
         } elseif ($role === 'admin') {
             // Get real admin data from database with safety checks
@@ -109,12 +95,6 @@ Route::get('/dashboard', function () {
             'forms_this_week' => 0,
             'thesis_this_week' => 0,
             'current_thesis_progress' => null,
-            'pending_reviews' => 0,
-            'completed_reviews' => 0,
-            'assigned_students' => 0,
-            'urgent_reviews' => 0,
-            'recent_submissions' => collect(),
-            'avg_review_time' => 0,
             'total_submissions' => 0,
             'active_users' => 1, // At least the current user
             'active_students' => 0,
@@ -141,7 +121,45 @@ Route::middleware(['auth', 'verified'])->group(function () {
         if (Auth::user()->role !== 'faculty') {
             abort(403, 'Unauthorized access.');
         }
-        return view('dashboard', ['userRole' => 'faculty']);
+        
+        $user = Auth::user();
+        $dashboardData = [];
+        
+        try {
+            // Check if tables exist before querying
+            $hasThesisDocuments = Schema::hasTable('thesis_documents');
+            $hasUsers = Schema::hasTable('users');
+            $hasNotifications = Schema::hasTable('notifications');
+            
+            // Get real faculty data from database with safety checks
+            $dashboardData = [
+                'pending_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')->count() : 0,
+                'completed_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('reviewed_by', $user->id)->count() : 0,
+                'assigned_students' => $hasUsers && $hasThesisDocuments ? \App\Models\User::where('role', 'student')
+                    ->whereHas('thesisDocuments', function($q) use ($user) {
+                        $q->where('reviewed_by', $user->id);
+                    })->count() : 0,
+                'urgent_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')
+                    ->where('created_at', '<=', now()->subDays(5))->count() : 0,
+                'recent_submissions' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')
+                    ->with('user')->orderBy('created_at', 'desc')->take(5)->get() : collect(),
+                'avg_review_time' => 2.5, // This would need more complex calculation
+                'unread_notifications' => $hasNotifications ? $user->unreadNotifications()->count() : 0,
+            ];
+        } catch (\Exception $e) {
+            // If any error occurs, provide safe default values
+            $dashboardData = [
+                'pending_reviews' => 0,
+                'completed_reviews' => 0,
+                'assigned_students' => 0,
+                'urgent_reviews' => 0,
+                'recent_submissions' => collect(),
+                'avg_review_time' => 0,
+                'unread_notifications' => 0,
+            ];
+        }
+        
+        return view('faculty.dashboard', compact('dashboardData'));
     })->name('faculty.dashboard');
 
     Route::get('/student/dashboard', function () {

@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-                {{ __('Submit ') . ucfirst($formType) . __(' Form') }}
+                {{ __('Submit ') . ucfirst(str_replace('_', ' ', $documentType)) }}
             </h2>
             <div class="text-sm text-gray-500 dark:text-gray-400">
                 {{ now()->format('l, F j, Y') }}
@@ -45,25 +45,29 @@
             <!-- Page Header -->
             <div class="mb-8 text-center">
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl shadow-2xl mb-6">
-                    @if($formType === 'registration')
+                    @if($documentType === 'proposal')
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                    @elseif($formType === 'clearance')
+                    @elseif($documentType === 'approval_sheet')
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
+                    @elseif($documentType === 'panel_assignment')
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
                     @else
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                     @endif
                 </div>
                 <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
-                    Submit {{ ucfirst($formType) }} Form
+                    Submit {{ ucfirst(str_replace('_', ' ', $documentType)) }}
                 </h1>
                 <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                    Complete all required fields and upload necessary documents for your {{ $formType }} form submission.
+                    Complete all required fields and upload necessary documents for your {{ str_replace('_', ' ', $documentType) }} submission.
                 </p>
             </div>
 
@@ -95,9 +99,9 @@
             @endif
 
             <!-- Main Form -->
-            <form method="POST" action="{{ route('student.forms.store') }}" enctype="multipart/form-data" id="academicForm" class="space-y-8">
+            <form method="POST" action="{{ route('student.thesis.store') }}" enctype="multipart/form-data" id="thesisForm" class="space-y-8">
                 @csrf
-                <input type="hidden" name="form_type" value="{{ $formType }}">
+                <input type="hidden" name="document_type" value="{{ $documentType }}">
 
                 <!-- Basic Information Section -->
                 <div class="form-section bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -117,135 +121,124 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Student ID -->
                                 <div>
-                                    <label for="student_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <label for="student_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                                         Student ID <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="student_id" id="student_id" value="{{ old('student_id') }}" required
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                            placeholder="Enter your student ID">
                                     @error('student_id')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
-                                <!-- Academic Year -->
+                                <!-- Full Name -->
                                 <div>
-                                    <label for="academic_year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Academic Year <span class="text-red-500">*</span>
+                                    <label for="full_name" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                        Full Name <span class="text-red-500">*</span>
                                     </label>
-                                    <select name="academic_year" id="academic_year" required
-                                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                        <option value="">Select Academic Year</option>
-                                        <option value="2023-2024" {{ old('academic_year') == '2023-2024' ? 'selected' : '' }}>2023-2024</option>
-                                        <option value="2024-2025" {{ old('academic_year') == '2024-2025' ? 'selected' : '' }}>2024-2025</option>
-                                        <option value="2025-2026" {{ old('academic_year') == '2025-2026' ? 'selected' : '' }}>2025-2026</option>
-                                    </select>
-                                    @error('academic_year')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <input type="text" name="full_name" id="full_name" value="{{ old('full_name', auth()->user()->name) }}" required
+                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                           placeholder="Enter your full name">
+                                    @error('full_name')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
-                                <!-- Semester -->
+                                <!-- Course/Program -->
                                 <div>
-                                    <label for="semester" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Semester <span class="text-red-500">*</span>
+                                    <label for="course_program" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                        Course / Program <span class="text-red-500">*</span>
                                     </label>
-                                    <select name="semester" id="semester" required
-                                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                        <option value="">Select Semester</option>
-                                        <option value="1st" {{ old('semester') == '1st' ? 'selected' : '' }}>1st Semester</option>
-                                        <option value="2nd" {{ old('semester') == '2nd' ? 'selected' : '' }}>2nd Semester</option>
-                                        <option value="Summer" {{ old('semester') == 'Summer' ? 'selected' : '' }}>Summer</option>
+                                    <select name="course_program" id="course_program" required
+                                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                        <option value="">Select Course/Program</option>
+                                        <option value="BS in Information Technology" {{ old('course_program') == 'BS in Information Technology' ? 'selected' : '' }}>BS in Information Technology</option>
+                                        <option value="BS in Computer Science" {{ old('course_program') == 'BS in Computer Science' ? 'selected' : '' }}>BS in Computer Science</option>
+                                        <option value="BS in Information System" {{ old('course_program') == 'BS in Information System' ? 'selected' : '' }}>BS in Information System</option>
                                     </select>
-                                    @error('semester')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @error('course_program')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
-                                <!-- Program -->
+                                <!-- Date of Submission -->
                                 <div>
-                                    <label for="program" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Program <span class="text-red-500">*</span>
+                                    <label for="submission_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                        Date of Submission <span class="text-red-500">*</span>
                                     </label>
-                                    <select name="program" id="program" required
-                                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                        <option value="">Select Program</option>
-                                        <option value="BS in Information Technology" {{ old('program') == 'BS in Information Technology' ? 'selected' : '' }}>BS in Information Technology</option>
-                                        <option value="BS in Computer Science" {{ old('program') == 'BS in Computer Science' ? 'selected' : '' }}>BS in Computer Science</option>
-                                        <option value="BS in Information System" {{ old('program') == 'BS in Information System' ? 'selected' : '' }}>BS in Information System</option>
-                                    </select>
-                                    @error('program')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <input type="date" name="submission_date" id="submission_date" value="{{ old('submission_date', now()->format('Y-m-d')) }}" required
+                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    @error('submission_date')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
                             </div>
 
-                            <!-- Title -->
+                            <!-- Thesis Title -->
                             <div class="mt-6">
-                                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Form Title <span class="text-red-500">*</span>
+                                <label for="title" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    Thesis Title <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="title" id="title" value="{{ old('title') }}" required
-                                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                       placeholder="Enter a descriptive title for this form">
+                                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                       placeholder="Enter your thesis title">
                                 @error('title')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <!-- Description -->
                             <div class="mt-6">
-                                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Description
+                                <label for="description" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    Brief Description
                                 </label>
                                 <textarea name="description" id="description" rows="3"
-                                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                          placeholder="Provide additional details about this form submission">{{ old('description') }}</textarea>
+                                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                          placeholder="Provide a brief description of your thesis...">{{ old('description') }}</textarea>
                                 @error('description')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
+                            </div>
+
+                            <!-- Adviser Selection -->
+                            <div class="mt-6">
+                                <label for="adviser_name" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    Adviser <span class="text-red-500">*</span>
+                                </label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <select name="adviser_id" id="adviser_id"
+                                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                        <option value="">Select from Faculty List</option>
+                                        @foreach(\App\Models\User::where('role', 'faculty')->orderBy('name')->get() as $faculty)
+                                            <option value="{{ $faculty->id }}" {{ old('adviser_id') == $faculty->id ? 'selected' : '' }}>
+                                                {{ $faculty->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <input type="text" name="adviser_name" id="adviser_name" value="{{ old('adviser_name') }}" 
+                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                           placeholder="Or enter adviser name manually">
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Select from the dropdown or enter manually if not listed</p>
+                                @error('adviser_name') @error('adviser_id')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror @enderror
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Form-Specific Fields -->
-                <div class="form-section bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="px-8 py-6 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-b border-gray-200 dark:border-gray-700">
-                        <div class="flex items-center space-x-4">
-                            <div class="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg">
-                                @if($formType === 'registration')
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                @elseif($formType === 'clearance')
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                @else
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                @endif
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                {{ ucfirst($formType) }} Specific Information
-                            </h3>
-                        </div>
-                    </div>
-                    
-                    <div class="p-8">
-                        <div class="field-group">
-                            @if($formType === 'registration')
-                                @include('student.forms.partials.registration-fields')
-                            @elseif($formType === 'clearance')
-                                @include('student.forms.partials.clearance-fields')
-                            @elseif($formType === 'evaluation')
-                                @include('student.forms.partials.evaluation-fields')
-                            @endif
-                        </div>
-                    </div>
-                </div>
+                <!-- Document-Specific Fields -->
+                @if($documentType === 'proposal')
+                    @include('student.thesis.partials.proposal-fields')
+                @elseif($documentType === 'approval_sheet')
+                    @include('student.thesis.partials.approval-fields')
+                @elseif($documentType === 'panel_assignment')
+                    @include('student.thesis.partials.panel-fields')
+                @elseif($documentType === 'final_manuscript')
+                    @include('student.thesis.partials.manuscript-fields')
+                @endif
 
                 <!-- File Upload Section -->
                 <div class="form-section bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -256,7 +249,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Supporting Documents</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Document Upload</h3>
                         </div>
                     </div>
                     
@@ -269,7 +262,7 @@
                                 <div>
                                     <label for="files" class="cursor-pointer">
                                         <span class="text-xl font-semibold text-gray-900 dark:text-gray-100 block mb-2">
-                                            Upload Supporting Documents
+                                            Upload Required Documents <span class="text-red-500">*</span>
                                         </span>
                                         <span class="text-gray-500 dark:text-gray-400 block mb-4">
                                             Click to upload or drag and drop files here
@@ -281,7 +274,7 @@
                                             Choose Files
                                         </span>
                                     </label>
-                                    <input id="files" name="files[]" type="file" class="sr-only" multiple 
+                                    <input id="files" name="files[]" type="file" class="sr-only" multiple required
                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="displaySelectedFiles(this)">
                                     <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
                                         Supported formats: PDF, DOC, DOCX, JPG, PNG (Max 10MB each)
@@ -294,42 +287,60 @@
                                 <h5 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">Selected Files:</h5>
                                 <div id="file-list" class="space-y-3"></div>
                             </div>
-                        </div>
                             @error('files.*')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
                 </div>
 
-                <!-- Remarks Section -->
+                <!-- Comments and Remarks Section -->
                 <div class="form-section bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="px-8 py-6 bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-b border-gray-200 dark:border-gray-700">
+                    <div class="px-8 py-6 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-b border-gray-200 dark:border-gray-700">
                         <div class="flex items-center space-x-4">
-                            <div class="p-3 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg">
+                            <div class="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Additional Remarks</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Additional Information</h3>
                         </div>
                     </div>
                     
                     <div class="p-8">
-                        <div class="field-group">
-                            <textarea name="remarks" id="remarks" rows="4"
-                                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                      placeholder="Any additional information or special requests...">{{ old('remarks') }}</textarea>
-                            @error('remarks')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                        <div class="field-group space-y-6">
+                            <!-- Comments -->
+                            <div>
+                                <label for="comments" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    Comments (Optional)
+                                </label>
+                                <textarea name="comments" id="comments" rows="4"
+                                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                          placeholder="Add any comments or questions regarding this submission...">{{ old('comments') }}</textarea>
+                                @error('comments')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Remarks -->
+                            <div>
+                                <label for="remarks" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    Remarks (Optional)
+                                </label>
+                                <textarea name="remarks" id="remarks" rows="3"
+                                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                          placeholder="Any additional notes or special considerations...">{{ old('remarks') }}</textarea>
+                                @error('remarks')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Submit Section -->
                 <div class="flex flex-col sm:flex-row gap-6 justify-end">
-                    <a href="{{ route('student.forms.index') }}" 
+                    <a href="{{ route('student.thesis.index') }}" 
                        class="px-8 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-center font-semibold">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -341,7 +352,7 @@
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                         </svg>
-                        Submit {{ ucfirst($formType) }} Form
+                        Submit {{ ucfirst(str_replace('_', ' ', $documentType)) }}
                     </button>
                 </div>
             </form>
@@ -387,7 +398,7 @@
         }
 
         // Form validation and submission
-        document.getElementById('academicForm').addEventListener('submit', function(e) {
+        document.getElementById('thesisForm').addEventListener('submit', function(e) {
             const submitButton = e.target.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.innerHTML = `
@@ -397,6 +408,19 @@
                 </svg>
                 Submitting...
             `;
+        });
+
+        // Adviser selection sync
+        document.getElementById('adviser_id').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('adviser_name').value = this.options[this.selectedIndex].text;
+            }
+        });
+
+        document.getElementById('adviser_name').addEventListener('input', function() {
+            if (this.value) {
+                document.getElementById('adviser_id').value = '';
+            }
         });
     </script>
 </x-app-layout> 

@@ -52,20 +52,18 @@ class ThesisReviewController extends Controller
             });
         }
 
-        $documents = $query->orderBy('submission_date', 'asc')->paginate(15);
+        $thesisDocuments = $query->orderBy('submission_date', 'asc')->paginate(15);
 
         // Get statistics
         $stats = [
             'total_pending' => ThesisDocument::whereIn('status', ['pending', 'under_review'])->count(),
             'urgent_reviews' => ThesisDocument::where('status', 'pending')
                 ->where('submission_date', '<=', now()->subDays(5))->count(),
-            'completed_this_month' => ThesisDocument::where('status', 'approved')
-                ->whereMonth('reviewed_at', now()->month)->count(),
-            'returned_for_revision' => ThesisDocument::where('status', 'returned_for_revision')
-                ->whereMonth('updated_at', now()->month)->count(),
+            'under_review' => ThesisDocument::where('status', 'under_review')->count(),
+            'this_week' => ThesisDocument::where('created_at', '>=', now()->subWeek())->count(),
         ];
 
-        return view('faculty.thesis.reviews', compact('documents', 'stats'));
+        return view('faculty.thesis.reviews', compact('thesisDocuments', 'stats'));
     }
 
     /**

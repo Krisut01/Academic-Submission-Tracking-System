@@ -61,9 +61,9 @@
         <!-- Hero Section -->
         <section class="py-16 lg:py-24">
             <div class="container mx-auto px-4 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                     <!-- Content -->
-                    <div class="text-center md:text-left pr-0 md:pr-8">
+                    <div class="text-center md:text-left">
                         <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
                             Professional Test Creation Made
                             <span class="text-blue-600">Simple</span>
@@ -102,7 +102,7 @@
                     </div>
 
                     <!-- Login Form -->
-                    <div id="login" class="bg-white p-10 rounded-xl shadow-xl max-w-md mx-auto md:mx-0 md:ml-12 mt-8 md:mt-0">
+                    <div id="login" class="bg-white p-8 rounded-xl shadow-xl max-w-md mx-auto md:mx-0 md:ml-8">
                         <div class="text-center mb-8">
                             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
