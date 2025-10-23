@@ -20,7 +20,7 @@
                             </p>
                         </div>
                         <a href="{{ route('student.forms.index') }}" 
-                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                           class="bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                             📝 Submit New Form
                         </a>
                     </div>
@@ -175,7 +175,7 @@
                             You haven't submitted any forms yet. Start by submitting your first academic form.
                         </p>
                         <a href="{{ route('student.forms.index') }}" 
-                           class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                           class="bg-blue-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                             📝 Submit Your First Form
                         </a>
                     </div>

@@ -136,7 +136,7 @@
                                                         </div>
                                                     </div>
                                                     <a href="{{ route('student.thesis.download', [$document, $index]) }}" 
-                                                       class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200">
+                                                       class="bg-blue-600 hover:bg-blue-700 text-gray-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200">
                                                         Download
                                                     </a>
                                                 </div>
@@ -185,7 +185,7 @@
                             <div>
                                 <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Review Decision</label>
                                 <select name="status" id="status" required 
-                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-900 dark:text-white">
                                     <option value="">Select Decision...</option>
                                     <option value="approved" {{ $document->status === 'approved' ? 'selected' : '' }}>✅ Approve</option>
                                     <option value="returned_for_revision" {{ $document->status === 'returned_for_revision' ? 'selected' : '' }}>📝 Return for Revision</option>
@@ -198,12 +198,12 @@
                                 <label for="review_comments" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Review Comments & Feedback</label>
                                 <textarea name="review_comments" id="review_comments" rows="6" 
                                           placeholder="Provide detailed feedback for the student..."
-                                          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">{{ old('review_comments', $document->review_comments) }}</textarea>
+                                          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-900 dark:text-white">{{ old('review_comments', $document->review_comments) }}</textarea>
                             </div>
 
                             <!-- Submit Button -->
                             <button type="submit" 
-                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center">
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>

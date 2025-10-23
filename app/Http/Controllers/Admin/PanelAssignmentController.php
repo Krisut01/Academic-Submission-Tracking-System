@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
+
 class PanelAssignmentController extends Controller
 {
     /**
@@ -29,7 +30,7 @@ class PanelAssignmentController extends Controller
     {
         $this->ensureUserIsAdmin();
 
-        $query = PanelAssignment::with(['student', 'thesisDocument', 'panelChair'])
+        $query = PanelAssignment::with(['student', 'thesisDocument', 'panelChair', 'secretary'])
             ->orderBy('defense_date', 'asc');
 
         // Apply filters
@@ -122,6 +123,7 @@ class PanelAssignmentController extends Controller
             'panel_members' => 'required|array|min:3|max:5',
             'panel_members.*' => 'exists:users,id',
             'panel_chair_id' => 'required|exists:users,id',
+            'secretary_id' => 'nullable|exists:users,id',
             'defense_date' => 'required|date|after:now',
             'defense_venue' => 'required|string|max:255',
             'defense_instructions' => 'nullable|string',
@@ -142,6 +144,7 @@ class PanelAssignmentController extends Controller
             'thesis_description' => $request->thesis_description,
             'panel_members' => $request->panel_members,
             'panel_chair_id' => $request->panel_chair_id,
+            'secretary_id' => $request->secretary_id,
             'defense_date' => $request->defense_date,
             'defense_venue' => $request->defense_venue,
             'defense_instructions' => $request->defense_instructions,
@@ -152,7 +155,7 @@ class PanelAssignmentController extends Controller
         // Send notifications
         $assignment->sendNotifications();
 
-        return redirect()->route('admin.panel.index')
+        return redirect()->route('admin.panel')
             ->with('success', 'Panel assignment created successfully! Notifications sent to student and panel members.');
     }
 
@@ -163,7 +166,7 @@ class PanelAssignmentController extends Controller
     {
         $this->ensureUserIsAdmin();
 
-        $assignment->load(['student', 'thesisDocument', 'panelChair', 'creator', 'updater']);
+        $assignment->load(['student', 'thesisDocument', 'panelChair', 'secretary', 'creator', 'updater']);
 
         return view('admin.panel.show', compact('assignment'));
     }
@@ -189,11 +192,10 @@ class PanelAssignmentController extends Controller
         $this->ensureUserIsAdmin();
 
         $request->validate([
-            'thesis_title' => 'required|string|max:255',
-            'thesis_description' => 'nullable|string',
             'panel_members' => 'required|array|min:3|max:5',
             'panel_members.*' => 'exists:users,id',
             'panel_chair_id' => 'required|exists:users,id',
+            'secretary_id' => 'nullable|exists:users,id',
             'defense_date' => 'required|date',
             'defense_venue' => 'required|string|max:255',
             'defense_instructions' => 'nullable|string',
@@ -210,11 +212,19 @@ class PanelAssignmentController extends Controller
                 ->withInput();
         }
 
+        // Additional validation for completed status
+        if ($request->status === 'completed') {
+            if (empty($request->result)) {
+                return redirect()->back()
+                    ->withErrors(['result' => 'Result is required when status is completed.'])
+                    ->withInput();
+            }
+        }
+
         $assignment->update([
-            'thesis_title' => $request->thesis_title,
-            'thesis_description' => $request->thesis_description,
             'panel_members' => $request->panel_members,
             'panel_chair_id' => $request->panel_chair_id,
+            'secretary_id' => $request->secretary_id,
             'defense_date' => $request->defense_date,
             'defense_venue' => $request->defense_venue,
             'defense_instructions' => $request->defense_instructions,
@@ -225,7 +235,10 @@ class PanelAssignmentController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return redirect()->route('admin.panel.index')
+        // Send update notifications if significant changes were made
+        $this->sendUpdateNotifications($assignment, $request);
+
+        return redirect()->route('admin.panel')
             ->with('success', 'Panel assignment updated successfully!');
     }
 
@@ -239,7 +252,7 @@ class PanelAssignmentController extends Controller
         $studentName = $assignment->student->name;
         $assignment->delete();
 
-        return redirect()->route('admin.panel.index')
+        return redirect()->route('admin.panel')
             ->with('success', "Panel assignment for {$studentName} has been deleted successfully!");
     }
 
@@ -304,6 +317,113 @@ class PanelAssignmentController extends Controller
             });
 
         return response()->json($assignments);
+    }
+
+    /**
+     * Get thesis documents for a specific student
+     */
+    public function getStudentThesis($studentId)
+    {
+        $this->ensureUserIsAdmin();
+
+        $thesisDocuments = ThesisDocument::where('user_id', $studentId)
+            ->where('status', 'approved')
+            ->where('document_type', 'final_manuscript')
+            ->select(['id', 'title', 'document_type'])
+            ->get();
+
+        return response()->json($thesisDocuments);
+    }
+
+    /**
+     * Get thesis document details
+     */
+    public function getThesisDetails($thesisId)
+    {
+        $this->ensureUserIsAdmin();
+
+        $thesis = ThesisDocument::findOrFail($thesisId);
+        
+        return response()->json([
+            'title' => $thesis->title,
+            'description' => $thesis->description ?? '',
+            'document_type' => $thesis->document_type,
+        ]);
+    }
+
+    /**
+     * Send update notifications for panel assignment changes
+     */
+    private function sendUpdateNotifications(PanelAssignment $assignment, Request $request): void
+    {
+        // Check if significant changes were made that require notifications
+        $significantChanges = [
+            'defense_date' => $request->defense_date,
+            'defense_venue' => $request->defense_venue,
+            'status' => $request->status,
+            'panel_members' => $request->panel_members,
+        ];
+
+        $hasSignificantChanges = false;
+        foreach ($significantChanges as $field => $newValue) {
+            if ($assignment->getOriginal($field) != $newValue) {
+                $hasSignificantChanges = true;
+                break;
+            }
+        }
+
+        if ($hasSignificantChanges) {
+            // Send notification to student
+            $studentNotification = [
+                'title' => 'Defense Assignment Updated',
+                'message' => "Your thesis defense assignment has been updated. Please check the new details.",
+                'data' => [
+                    'panel_assignment_id' => $assignment->id,
+                    'defense_date' => $assignment->defense_date,
+                    'venue' => $assignment->defense_venue,
+                    'status' => $assignment->status,
+                    'url' => route('student.thesis.index'),
+                ]
+            ];
+
+            \App\Models\Notification::createForUser(
+                $assignment->student_id,
+                'defense_updated',
+                $studentNotification['title'],
+                $studentNotification['message'],
+                $studentNotification['data'],
+                get_class($assignment),
+                $assignment->id,
+                'high'
+            );
+
+            // Send notification to panel members
+            if (!empty($assignment->panel_member_ids)) {
+                $panelNotification = [
+                    'title' => 'Panel Assignment Updated',
+                    'message' => "The panel assignment for {$assignment->student->name}'s thesis defense has been updated.",
+                    'data' => [
+                        'panel_assignment_id' => $assignment->id,
+                        'student_name' => $assignment->student->name,
+                        'defense_date' => $assignment->defense_date,
+                        'venue' => $assignment->defense_venue,
+                        'status' => $assignment->status,
+                        'url' => route('faculty.thesis.reviews'),
+                    ]
+                ];
+
+                \App\Models\Notification::createForUsers(
+                    $assignment->panel_member_ids,
+                    'panel_assignment_updated',
+                    $panelNotification['title'],
+                    $panelNotification['message'],
+                    $panelNotification['data'],
+                    get_class($assignment),
+                    $assignment->id,
+                    'high'
+                );
+            }
+        }
     }
 
     /**

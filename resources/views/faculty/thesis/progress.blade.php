@@ -24,13 +24,13 @@
                         <label for="student_search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search Students</label>
                         <input type="text" name="student_search" id="student_search" value="{{ request('student_search') }}" 
                                placeholder="Search by name or email"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-900 dark:text-white">
                     </div>
 
                     <!-- Progress Filter -->
                     <div>
                         <label for="progress_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Progress Stage</label>
-                        <select name="progress_filter" id="progress_filter" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                        <select name="progress_filter" id="progress_filter" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-900 dark:text-white">
                             <option value="">All Students</option>
                             <option value="proposal_submitted" {{ request('progress_filter') === 'proposal_submitted' ? 'selected' : '' }}>Proposal Submitted</option>
                             <option value="panel_assigned" {{ request('progress_filter') === 'panel_assigned' ? 'selected' : '' }}>Panel Assigned</option>
@@ -40,7 +40,7 @@
 
                     <!-- Filter Buttons -->
                     <div class="flex items-end gap-3">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-gray-900 dark:text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -90,7 +90,7 @@
                                     <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
                                         <div class="flex items-center">
                                             <div class="p-2 bg-blue-500 rounded-lg mr-3">
-                                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
                                             </div>
@@ -182,7 +182,7 @@
                                     
                                     @if($pendingDocs->count() > 0)
                                         <a href="{{ route('faculty.thesis.reviews') }}?student_search={{ urlencode($student->name) }}" 
-                                           class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 text-center">
+                                           class="flex-1 bg-red-600 hover:bg-red-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 text-center">
                                             Review Documents ({{ $pendingDocs->count() }})
                                         </a>
                                     @else
@@ -217,7 +217,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No students found</h3>
                     <p class="text-gray-600 dark:text-gray-400 mb-6">No students match your current filter criteria, or no students have thesis documents yet.</p>
                     <a href="{{ route('faculty.thesis.reviews') }}" 
-                       class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+                       class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Notification;
 
 class PanelAssignment extends Model
 {
@@ -18,6 +20,7 @@ class PanelAssignment extends Model
         'thesis_description',
         'panel_members',
         'panel_chair_id',
+        'secretary_id',
         'defense_date',
         'defense_venue',
         'defense_instructions',
@@ -66,6 +69,14 @@ class PanelAssignment extends Model
     }
 
     /**
+     * Get the secretary
+     */
+    public function secretary(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'secretary_id');
+    }
+
+    /**
      * Get the user who created this assignment
      */
     public function creator(): BelongsTo
@@ -92,6 +103,18 @@ class PanelAssignment extends Model
 
         $memberIds = json_decode($this->attributes['panel_members'], true);
         return User::whereIn('id', $memberIds)->get();
+    }
+
+    /**
+     * Get panel member IDs as array
+     */
+    public function getPanelMemberIdsAttribute()
+    {
+        if (empty($this->attributes['panel_members'])) {
+            return [];
+        }
+
+        return json_decode($this->attributes['panel_members'], true) ?? [];
     }
 
     /**
@@ -174,14 +197,16 @@ class PanelAssignment extends Model
      */
     public function sendNotifications(): void
     {
+        $secretaryInfo = $this->secretary ? " with {$this->secretary->name} as secretary" : "";
         $studentNotification = [
             'title' => 'Defense Scheduled',
-            'message' => "Your thesis defense has been scheduled for {$this->defense_date->format('M d, Y h:i A')}",
+            'message' => "Your thesis defense has been scheduled for {$this->defense_date->format('M d, Y h:i A')}{$secretaryInfo}",
             'data' => [
                 'panel_assignment_id' => $this->id,
                 'defense_date' => $this->defense_date,
                 'venue' => $this->defense_venue,
-                'url' => route('student.thesis.defense', $this->id),
+                'secretary_name' => $this->secretary?->name,
+                'url' => route('student.thesis.index'),
             ]
         ];
 
@@ -198,15 +223,17 @@ class PanelAssignment extends Model
 
         // Notify panel members
         if (!empty($this->panel_members)) {
+            $secretaryInfo = $this->secretary ? " Secretary: {$this->secretary->name}." : "";
             $panelNotification = [
                 'title' => 'Panel Assignment',
-                'message' => "You have been assigned to review {$this->student->name}'s thesis defense",
+                'message' => "You have been assigned to review {$this->student->name}'s thesis defense.{$secretaryInfo}",
                 'data' => [
                     'panel_assignment_id' => $this->id,
                     'student_name' => $this->student->name,
                     'defense_date' => $this->defense_date,
                     'venue' => $this->defense_venue,
-                    'url' => route('faculty.panel.assignment', $this->id),
+                    'secretary_name' => $this->secretary?->name,
+                    'url' => route('faculty.thesis.reviews'),
                 ]
             ];
 

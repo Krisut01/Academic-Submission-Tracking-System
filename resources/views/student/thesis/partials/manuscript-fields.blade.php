@@ -3,7 +3,7 @@
     <div class="px-8 py-6 bg-gradient-to-r from-violet-50 to-violet-100 dark:from-violet-900/20 dark:to-violet-800/20 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center space-x-4">
             <div class="p-3 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl shadow-lg">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
             </div>
@@ -20,7 +20,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Final Revisions Completed -->
                     <div>
-                        <label for="final_revisions_completed" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="final_revisions_completed" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             Final Revisions Completed? <span class="text-red-500">*</span>
                         </label>
                         <div class="flex items-center space-x-6">
@@ -42,7 +42,7 @@
 
                     <!-- Manuscript Status -->
                     <div>
-                        <label for="manuscript_status" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="manuscript_status" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             Manuscript Status <span class="text-red-500">*</span>
                         </label>
                         <select name="manuscript_status" id="manuscript_status" required
@@ -64,7 +64,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Total Pages -->
                 <div>
-                    <label for="total_pages" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <label for="total_pages" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                         Total Pages <span class="text-red-500">*</span>
                     </label>
                     <input type="number" name="total_pages" id="total_pages" value="{{ old('total_pages') }}" required min="1"
@@ -77,7 +77,7 @@
 
                 <!-- Total Chapters -->
                 <div>
-                    <label for="total_chapters" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <label for="total_chapters" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                         Total Chapters <span class="text-red-500">*</span>
                     </label>
                     <input type="number" name="total_chapters" id="total_chapters" value="{{ old('total_chapters') }}" required min="1"
@@ -90,7 +90,7 @@
 
                 <!-- Word Count -->
                 <div>
-                    <label for="word_count" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <label for="word_count" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                         Approximate Word Count
                     </label>
                     <input type="number" name="word_count" id="word_count" value="{{ old('word_count') }}" min="1000"
@@ -104,10 +104,10 @@
 
             <!-- Chapter Completion Checklist -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Chapters Completed <span class="text-red-500">*</span>
                 </label>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Check all chapters that are completed and included in the manuscript</p>
+                <p class="text-sm text-gray-500 dark:text-gray-300 mb-4">Check all chapters that are completed and included in the manuscript</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <label class="flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -168,7 +168,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Has Plagiarism Report -->
                     <div>
-                        <label for="has_plagiarism_report" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="has_plagiarism_report" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             Turnitin/Plagiarism Report Available? <span class="text-red-500">*</span>
                         </label>
                         <div class="flex items-center space-x-6">
@@ -190,7 +190,7 @@
 
                     <!-- Plagiarism Percentage -->
                     <div id="plagiarism_percentage_div" style="display: none;">
-                        <label for="plagiarism_percentage" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="plagiarism_percentage" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             Similarity Percentage <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
@@ -210,7 +210,7 @@
                 <div id="plagiarism_details_div" style="display: none;" class="mt-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="plagiarism_tool" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                            <label for="plagiarism_tool" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                                 Plagiarism Check Tool Used
                             </label>
                             <select name="plagiarism_tool" id="plagiarism_tool"
@@ -228,7 +228,7 @@
                         </div>
 
                         <div>
-                            <label for="plagiarism_check_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                            <label for="plagiarism_check_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                                 Date of Plagiarism Check
                             </label>
                             <input type="date" name="plagiarism_check_date" id="plagiarism_check_date" value="{{ old('plagiarism_check_date') }}"
@@ -243,10 +243,10 @@
 
             <!-- Formatting and Compliance -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Formatting and Compliance Checklist <span class="text-red-500">*</span>
                 </label>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Confirm that your manuscript meets all formatting requirements</p>
+                <p class="text-sm text-gray-500 dark:text-gray-300 mb-4">Confirm that your manuscript meets all formatting requirements</p>
                 
                 <div class="space-y-3">
                     <label class="flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -287,11 +287,11 @@
 
             <!-- Additional Manuscript Information -->
             <div>
-                <label for="manuscript_notes" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="manuscript_notes" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Additional Notes or Comments
                 </label>
                 <textarea name="manuscript_notes" id="manuscript_notes" rows="4"
-                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
                           placeholder="Any additional information about your manuscript, special considerations, or notes for reviewers...">{{ old('manuscript_notes') }}</textarea>
                 @error('manuscript_notes')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -305,7 +305,7 @@
 <div class="bg-violet-50 dark:bg-violet-900/20 rounded-2xl p-6 border border-violet-200 dark:border-violet-800">
     <div class="flex items-start space-x-4">
         <div class="p-2 bg-violet-500 rounded-lg flex-shrink-0">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
         </div>

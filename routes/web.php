@@ -110,12 +110,9 @@ Route::get('/dashboard', function () {
 
 // Role-based dashboard routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
-        }
-        return view('dashboard', ['userRole' => 'admin']);
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/dashboard/stats', [App\Http\Controllers\Admin\DashboardController::class, 'getStats'])->name('admin.dashboard.stats');
+    Route::get('/admin/dashboard/activity', [App\Http\Controllers\Admin\DashboardController::class, 'getRecentActivity'])->name('admin.dashboard.activity');
 
     Route::get('/faculty/dashboard', function () {
         if (Auth::user()->role !== 'faculty') {
@@ -240,6 +237,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('/panel/{assignment}/notify', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'resendNotifications'])->name('panel.notify');
     Route::get('/panel/api/faculty', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'getAvailableFaculty'])->name('panel.api.faculty');
     Route::get('/panel/api/schedule', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'getSchedule'])->name('panel.api.schedule');
+    Route::get('/panel/api/student-thesis/{studentId}', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'getStudentThesis'])->name('panel.api.student-thesis');
+    Route::get('/panel/api/thesis-details/{thesisId}', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'getThesisDetails'])->name('panel.api.thesis-details');
 
     // Settings
     Route::get('/settings', [App\Http\Controllers\SettingsController::class, 'index'])->name('settings');
@@ -272,10 +271,17 @@ Route::middleware(['auth', 'verified'])->prefix('notifications')->name('notifica
     Route::delete('/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
 });
 
+// Redirect old profile routes to new settings system
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', function () {
+        return redirect()->route('settings.index');
+    })->name('profile.edit');
+    Route::patch('/profile', function () {
+        return redirect()->route('settings.profile');
+    })->name('profile.update');
+    Route::delete('/profile', function () {
+        return redirect()->route('settings.privacy');
+    })->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

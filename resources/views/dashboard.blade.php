@@ -77,13 +77,33 @@
             @if(Auth::user()->role === 'admin')
                 <!-- Modern Admin Dashboard -->
                 <div class="space-y-8">
+                    <!-- Dashboard Header with Refresh Button -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+                            <p class="text-gray-600 dark:text-gray-400">Real-time system overview and statistics</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span>Live Updates</span>
+                            </div>
+                            <button onclick="refreshDashboard()" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Quick Stats Overview -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <!-- Total Submissions -->
                         <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl p-6 border border-purple-200/50 dark:border-purple-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-purple-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                 </div>
@@ -97,7 +117,7 @@
                         <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-6 border border-blue-200/50 dark:border-blue-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-blue-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                                     </svg>
                                 </div>
@@ -111,7 +131,7 @@
                         <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-2xl p-6 border border-orange-200/50 dark:border-orange-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-orange-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-6 6v6a1 1 0 001 1h4a1 1 0 001-1v-6M8 13h8"></path>
                                     </svg>
                                 </div>
@@ -134,7 +154,7 @@
                         <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 rounded-2xl p-6 border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-emerald-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
@@ -185,7 +205,7 @@
                                 <div class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-6 mb-6 border border-red-100 dark:border-red-800/50">
                                     <div class="flex items-start gap-4">
                                         <div class="p-2 bg-red-500 rounded-lg shadow-sm">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                                             </svg>
                                         </div>
@@ -245,7 +265,7 @@
 
                                 <!-- Admin Actions -->
                                 <div class="flex gap-3 mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
-                                    <a href="{{ route('admin.records') }}" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200 shadow-sm text-center">
+                                    <a href="{{ route('admin.records') }}" class="flex-1 bg-purple-600 hover:bg-purple-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg font-medium transition duration-200 shadow-sm text-center">
                                         View All Records
                                     </a>
                                     <a href="{{ route('admin.reports') }}" class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium transition duration-200 text-center">
@@ -398,7 +418,7 @@
                         <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-2xl p-6 border border-red-200/50 dark:border-red-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-red-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
@@ -412,7 +432,7 @@
                         <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 rounded-2xl p-6 border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-emerald-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
@@ -426,7 +446,7 @@
                         <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-6 border border-blue-200/50 dark:border-blue-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-blue-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                                     </svg>
                                 </div>
@@ -440,7 +460,7 @@
                         <div class="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-2xl p-6 border border-amber-200/50 dark:border-amber-700/50 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-amber-500 rounded-xl shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                                     </svg>
                                 </div>
@@ -478,7 +498,7 @@
                                 <div class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-6 mb-6 border border-red-100 dark:border-red-800/50">
                                     <div class="flex items-start gap-4">
                                         <div class="p-2 bg-red-500 rounded-lg shadow-sm">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                         </div>
@@ -514,7 +534,7 @@
                                                     <p class="text-xs text-gray-500 dark:text-gray-400">Submitted {{ $submission->created_at->diffForHumans() }} • {{ Str::limit($submission->title, 50) }}</p>
                                                 </div>
                                                 @if($submission->status === 'pending')
-                                                    <a href="{{ route('faculty.thesis.show', $submission) }}" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">
+                                                    <a href="{{ route('faculty.thesis.show', $submission) }}" class="px-3 py-1.5 bg-blue-600 text-gray-900 dark:text-white text-xs rounded-lg hover:bg-blue-700 transition">
                                                         Review
                                                     </a>
                                                 @else
@@ -537,7 +557,7 @@
 
                                 <!-- Actions -->
                                 <div class="flex gap-3 mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
-                                    <a href="{{ route('faculty.thesis.reviews') }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200 shadow-sm text-center">
+                                    <a href="{{ route('faculty.thesis.reviews') }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg font-medium transition duration-200 shadow-sm text-center">
                                         Review All Pending
                                     </a>
                                     <a href="{{ route('faculty.thesis.progress') }}" class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium transition duration-200 text-center">
@@ -667,7 +687,7 @@
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-blue-600 rounded-lg shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                 </div>
@@ -681,7 +701,7 @@
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-emerald-600 rounded-lg shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                     </svg>
                                 </div>
@@ -695,7 +715,7 @@
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-green-600 rounded-lg shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
@@ -714,7 +734,7 @@
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-orange-600 rounded-lg shadow-sm">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
@@ -761,7 +781,7 @@
                                         <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-8 border border-blue-200 dark:border-blue-700">
                                             <div class="flex items-start gap-4">
                                                 <div class="p-3 bg-blue-600 rounded-lg flex-shrink-0">
-                                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                                     </svg>
                                                 </div>
@@ -783,7 +803,7 @@
                                         <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-8 mb-8 text-center">
                                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Active Thesis</h3>
                                             <p class="text-gray-600 dark:text-gray-400 mb-4">Start by submitting your thesis proposal</p>
-                                            <a href="{{ route('student.thesis.index') }}" class="inline-flex items-center px-6 py-3 btn-primary font-semibold rounded-lg transition duration-200 shadow-sm btn-text-white">
+                                            <a href="{{ route('student.thesis.index') }}" class="inline-flex items-center px-6 py-3 btn-primary font-semibold rounded-lg transition duration-200 shadow-sm btn-text-gray-900 dark:text-white">
                                                 Submit Thesis Document
                                             </a>
                                         </div>
@@ -829,10 +849,10 @@
                                 <!-- Action Buttons with Better Styling -->
                                 <div class="px-8 py-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 rounded-b-xl">
                                     <div class="flex gap-4">
-                                        <a href="{{ route('student.forms.history') }}" class="flex-1 btn-primary px-6 py-3 rounded-lg font-semibold transition duration-200 text-center shadow-sm btn-text-white">
+                                        <a href="{{ route('student.forms.history') }}" class="flex-1 btn-primary px-6 py-3 rounded-lg font-semibold transition duration-200 text-center shadow-sm btn-text-gray-900 dark:text-white">
                                             View Form History
                                         </a>
-                                        <a href="{{ route('student.thesis.history') }}" class="flex-1 btn-secondary px-6 py-3 rounded-lg font-semibold transition duration-200 text-center shadow-sm btn-text-white">
+                                        <a href="{{ route('student.thesis.history') }}" class="flex-1 btn-secondary px-6 py-3 rounded-lg font-semibold transition duration-200 text-center shadow-sm btn-text-gray-900 dark:text-white">
                                             View Thesis History
                                         </a>
                                     </div>
@@ -852,7 +872,7 @@
                                     <!-- Submit Academic Forms -->
                                     <a href="{{ route('student.forms.index') }}" class="flex items-center gap-4 p-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group border border-blue-200 dark:border-blue-700">
                                         <div class="p-3 bg-blue-600 rounded-lg group-hover:bg-blue-700 transition-colors flex-shrink-0">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                             </svg>
                                         </div>
@@ -867,7 +887,7 @@
                                         <!-- Show "Continue Thesis Work" if thesis exists -->
                                         <a href="{{ route('student.thesis.index') }}" class="flex items-center gap-4 p-4 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200 group border border-emerald-200 dark:border-emerald-700">
                                             <div class="p-3 bg-emerald-600 rounded-lg group-hover:bg-emerald-700 transition-colors flex-shrink-0">
-                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                                 </svg>
                                             </div>
@@ -880,7 +900,7 @@
                                         <!-- Show "Submit Thesis Documents" if no active thesis -->
                                         <a href="{{ route('student.thesis.index') }}" class="flex items-center gap-4 p-4 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200 group border border-emerald-200 dark:border-emerald-700">
                                             <div class="p-3 bg-emerald-600 rounded-lg group-hover:bg-emerald-700 transition-colors flex-shrink-0">
-                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                                 </svg>
                                             </div>
@@ -894,7 +914,7 @@
                                     <!-- View Submission History -->
                                     <a href="{{ route('student.forms.history') }}" class="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 group">
                                         <div class="p-3 bg-gray-600 rounded-lg group-hover:bg-gray-700 transition-colors flex-shrink-0">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                             </svg>
                                         </div>
@@ -950,4 +970,141 @@
             @endif
         </div>
     </div>
+
+    @if(Auth::user()->role === 'admin')
+    <!-- Real-time Dashboard Updates -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Global function for manual refresh
+            window.refreshDashboard = function() {
+                updateDashboardStats();
+                updateRecentActivity();
+                
+                // Show refresh indicator
+                const refreshBtn = document.querySelector('button[onclick="refreshDashboard()"]');
+                if (refreshBtn) {
+                    const originalText = refreshBtn.innerHTML;
+                    refreshBtn.innerHTML = '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Refreshing...';
+                    refreshBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        refreshBtn.innerHTML = originalText;
+                        refreshBtn.disabled = false;
+                    }, 2000);
+                }
+            };
+            
+            // Function to update dashboard statistics
+            function updateDashboardStats() {
+                fetch('{{ route("admin.dashboard.stats") }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update submissions received
+                    const submissionsElement = document.querySelector('.bg-gradient-to-br.from-purple-50 .text-2xl');
+                    if (submissionsElement) {
+                        submissionsElement.textContent = data.total_submissions || 0;
+                    }
+                    
+                    const submissionsWeekElement = document.querySelector('.bg-gradient-to-br.from-purple-50 .text-xs');
+                    if (submissionsWeekElement) {
+                        submissionsWeekElement.textContent = `+${data.submissions_this_week || 0} this week`;
+                    }
+                    
+                    // Update active users
+                    const activeUsersElement = document.querySelector('.bg-gradient-to-br.from-blue-50 .text-2xl');
+                    if (activeUsersElement) {
+                        activeUsersElement.textContent = data.active_users || 0;
+                    }
+                    
+                    const usersBreakdownElement = document.querySelector('.bg-gradient-to-br.from-blue-50 .text-xs');
+                    if (usersBreakdownElement) {
+                        usersBreakdownElement.textContent = `${data.active_students || 0} Students, ${data.active_faculty || 0} Faculty`;
+                    }
+                    
+                    // Update defense schedule
+                    const defenseElement = document.querySelector('.bg-gradient-to-br.from-orange-50 .text-2xl');
+                    if (defenseElement) {
+                        defenseElement.textContent = data.scheduled_defenses || 0;
+                    }
+                    
+                    const defenseWeekElement = document.querySelector('.bg-gradient-to-br.from-orange-50 .text-xs');
+                    if (defenseWeekElement) {
+                        defenseWeekElement.textContent = `${data.defenses_this_week || 0} this week`;
+                    }
+                    
+                    // Update system health
+                    const systemHealthElement = document.querySelector('.bg-gradient-to-br.from-emerald-50 .text-2xl');
+                    if (systemHealthElement) {
+                        systemHealthElement.textContent = `${data.system_health || 100}%`;
+                    }
+                    
+                    const systemStatusElement = document.querySelector('.bg-gradient-to-br.from-emerald-50 .text-xs');
+                    if (systemStatusElement) {
+                        if (data.system_health >= 95) {
+                            systemStatusElement.textContent = 'All systems online';
+                        } else if (data.system_health >= 80) {
+                            systemStatusElement.textContent = 'Minor issues detected';
+                        } else {
+                            systemStatusElement.textContent = 'Attention required';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Dashboard stats update failed:', error);
+                });
+            }
+            
+            // Function to update recent activity
+            function updateRecentActivity() {
+                fetch('{{ route("admin.dashboard.activity") }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update recent activity section if it exists
+                    const activityContainer = document.querySelector('.recent-activity-container');
+                    if (activityContainer && data.length > 0) {
+                        // You can implement activity updates here if needed
+                        console.log('Recent activity updated:', data.length, 'items');
+                    }
+                })
+                .catch(error => {
+                    console.log('Recent activity update failed:', error);
+                });
+            }
+            
+            // Update stats immediately on page load
+            updateDashboardStats();
+            updateRecentActivity();
+            
+            // Set up periodic updates every 30 seconds
+            setInterval(updateDashboardStats, 30000);
+            setInterval(updateRecentActivity, 60000);
+            
+            // Add visual indicator for real-time updates
+            const updateIndicator = document.createElement('div');
+            updateIndicator.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg z-50';
+            updateIndicator.innerHTML = '🟢 Live Updates';
+            document.body.appendChild(updateIndicator);
+            
+            // Hide indicator after 3 seconds
+            setTimeout(() => {
+                updateIndicator.style.opacity = '0';
+                setTimeout(() => {
+                    updateIndicator.remove();
+                }, 500);
+            }, 3000);
+        });
+    </script>
+    @endif
 </x-app-layout>

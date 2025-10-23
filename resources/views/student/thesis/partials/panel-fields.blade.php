@@ -3,7 +3,7 @@
     <div class="px-8 py-6 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center space-x-4">
             <div class="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
             </div>
@@ -15,7 +15,7 @@
         <div class="field-group space-y-6">
             <!-- Defense Type -->
             <div>
-                <label for="defense_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="defense_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Defense Type <span class="text-red-500">*</span>
                 </label>
                 <select name="defense_type" id="defense_type" required
@@ -32,17 +32,17 @@
 
             <!-- Preferred Panel Members -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Preferred Panel Members (Optional)
                 </label>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <p class="text-sm text-gray-500 dark:text-gray-300 mb-4">
                     These are your preferred panel members. The final assignment will be made by the administration based on availability and expertise.
                 </p>
                 
                 <div class="space-y-4">
                     <!-- Preferred Panel Chair -->
                     <div>
-                        <label for="preferred_panel_chair" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Preferred Panel Chair</label>
+                        <label for="preferred_panel_chair" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Preferred Panel Chair</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <select name="preferred_panel_chair_id" id="preferred_panel_chair_id"
                                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -64,7 +64,7 @@
 
                     <!-- Preferred Panel Member 1 -->
                     <div>
-                        <label for="preferred_panel_member_1" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Preferred Panel Member 1</label>
+                        <label for="preferred_panel_member_1" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Preferred Panel Member 1</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <select name="preferred_panel_member_1_id" id="preferred_panel_member_1_id"
                                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -86,7 +86,7 @@
 
                     <!-- Preferred Panel Member 2 -->
                     <div>
-                        <label for="preferred_panel_member_2" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Preferred Panel Member 2</label>
+                        <label for="preferred_panel_member_2" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Preferred Panel Member 2</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <select name="preferred_panel_member_2_id" id="preferred_panel_member_2_id"
                                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -110,13 +110,13 @@
 
             <!-- Specialization Areas -->
             <div>
-                <label for="required_specializations" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="required_specializations" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Required Specialization Areas <span class="text-red-500">*</span>
                 </label>
                 <textarea name="required_specializations" id="required_specializations" rows="4" required
-                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
                           placeholder="List the specific areas of expertise required from panel members for your thesis (e.g., Clinical Research, Laboratory Medicine, Statistics, etc.)">{{ old('required_specializations') }}</textarea>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">
                     Be specific about the expertise areas needed to properly evaluate your research
                 </p>
                 @error('required_specializations')
@@ -131,7 +131,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Preferred Date 1 -->
                     <div>
-                        <label for="preferred_date_1" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="preferred_date_1" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             1st Choice Date <span class="text-red-500">*</span>
                         </label>
                         <input type="date" name="preferred_date_1" id="preferred_date_1" value="{{ old('preferred_date_1') }}" required
@@ -143,7 +143,7 @@
 
                     <!-- Preferred Date 2 -->
                     <div>
-                        <label for="preferred_date_2" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="preferred_date_2" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             2nd Choice Date
                         </label>
                         <input type="date" name="preferred_date_2" id="preferred_date_2" value="{{ old('preferred_date_2') }}"
@@ -155,7 +155,7 @@
 
                     <!-- Preferred Date 3 -->
                     <div>
-                        <label for="preferred_date_3" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="preferred_date_3" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             3rd Choice Date
                         </label>
                         <input type="date" name="preferred_date_3" id="preferred_date_3" value="{{ old('preferred_date_3') }}"
@@ -169,7 +169,7 @@
                 <!-- Preferred Time -->
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="preferred_time" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="preferred_time" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             Preferred Time <span class="text-red-500">*</span>
                         </label>
                         <select name="preferred_time" id="preferred_time" required
@@ -186,7 +186,7 @@
                     </div>
 
                     <div>
-                        <label for="preferred_venue" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <label for="preferred_venue" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                             Preferred Venue Type
                         </label>
                         <select name="preferred_venue" id="preferred_venue"
@@ -206,7 +206,7 @@
 
             <!-- Special Requirements -->
             <div>
-                <label for="special_requirements" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="special_requirements" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Special Requirements or Accommodations
                 </label>
                 <textarea name="special_requirements" id="special_requirements" rows="4"
@@ -219,7 +219,7 @@
 
             <!-- Justification for Panel Request -->
             <div>
-                <label for="panel_justification" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="panel_justification" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Justification for Panel Assignment Request <span class="text-red-500">*</span>
                 </label>
                 <textarea name="panel_justification" id="panel_justification" rows="5" required
@@ -237,7 +237,7 @@
 <div class="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-6 border border-amber-200 dark:border-amber-800">
     <div class="flex items-start space-x-4">
         <div class="p-2 bg-amber-500 rounded-lg flex-shrink-0">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
         </div>

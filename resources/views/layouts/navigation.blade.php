@@ -57,7 +57,7 @@
                         </svg>
                         <!-- Notification Badge -->
                         @if(Auth::user()->unread_notification_count > 0)
-                            <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                            <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-900 dark:text-white bg-red-500 rounded-full">
                                 {{ Auth::user()->unread_notification_count > 99 ? '99+' : Auth::user()->unread_notification_count }}
                             </span>
                         @endif
@@ -135,14 +135,12 @@
                             ⚙️ {{ __('Settings') }}
                         </x-dropdown-link>
 
-                        <x-dropdown-link :href="route('profile.edit')">
-                            👤 {{ __('Profile') }}
-                        </x-dropdown-link>
+
 
                         <x-dropdown-link :href="route('notifications.index')">
                             🔔 {{ __('Notifications') }}
                             @if(Auth::user()->unread_notification_count > 0)
-                                <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                                <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-900 dark:text-white bg-red-500 rounded-full">
                                     {{ Auth::user()->unread_notification_count }}
                                 </span>
                             @endif
@@ -209,8 +207,8 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                <x-responsive-nav-link :href="route('settings.index')">
+                    {{ __('Settings') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

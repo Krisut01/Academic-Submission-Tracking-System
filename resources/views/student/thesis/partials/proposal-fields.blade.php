@@ -3,7 +3,7 @@
     <div class="px-8 py-6 bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center space-x-4">
             <div class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
             </div>
@@ -15,13 +15,13 @@
         <div class="field-group space-y-6">
             <!-- Abstract/Brief Description -->
             <div>
-                <label for="abstract" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="abstract" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Abstract / Brief Description <span class="text-red-500">*</span>
                 </label>
                 <textarea name="abstract" id="abstract" rows="6" required
-                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
                           placeholder="Provide a comprehensive abstract of your research proposal including background, objectives, methodology, and expected outcomes...">{{ old('abstract') }}</textarea>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Minimum 200 words recommended</p>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Minimum 200 words recommended</p>
                 @error('abstract')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -30,7 +30,7 @@
             <!-- Research Area/Specialization -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="research_area" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <label for="research_area" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                         Research Area / Specialization <span class="text-red-500">*</span>
                     </label>
                     <select name="research_area" id="research_area" required
@@ -60,7 +60,7 @@
 
                 <!-- Research Methodology -->
                 <div>
-                    <label for="methodology" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <label for="methodology" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                         Research Methodology <span class="text-red-500">*</span>
                     </label>
                     <select name="methodology" id="methodology" required
@@ -91,7 +91,7 @@
             <!-- Research Timeline -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="expected_start_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <label for="expected_start_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                         Expected Start Date <span class="text-red-500">*</span>
                     </label>
                     <input type="date" name="expected_start_date" id="expected_start_date" value="{{ old('expected_start_date') }}" required
@@ -102,7 +102,7 @@
                 </div>
 
                 <div>
-                    <label for="expected_completion_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <label for="expected_completion_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                         Expected Completion Date <span class="text-red-500">*</span>
                     </label>
                     <input type="date" name="expected_completion_date" id="expected_completion_date" value="{{ old('expected_completion_date') }}" required
@@ -115,13 +115,13 @@
 
             <!-- Research Keywords -->
             <div>
-                <label for="keywords" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="keywords" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Research Keywords <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="keywords" id="keywords" value="{{ old('keywords') }}" required
-                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
                        placeholder="Enter 5-8 keywords separated by commas (e.g., software development, web application, database design, user interface)">
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Separate keywords with commas. These will help in categorizing and searching your research.</p>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Separate keywords with commas. These will help in categorizing and searching your research.</p>
                 @error('keywords')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -129,13 +129,13 @@
 
             <!-- Research Objectives -->
             <div>
-                <label for="research_objectives" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="research_objectives" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Research Objectives <span class="text-red-500">*</span>
                 </label>
                 <textarea name="research_objectives" id="research_objectives" rows="5" required
-                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                          placeholder="List your general and specific research objectives. Use bullet points or numbered format for clarity...">{{ old('research_objectives') }}</textarea>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Clearly state both general and specific objectives of your research</p>
+                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
+                          placeholder="List your general and specific research objectives. Use bullet points or numbered format for clarity..."></textarea>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Clearly state both general and specific objectives of your research</p>
                 @error('research_objectives')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -143,12 +143,12 @@
 
             <!-- Expected Outcomes -->
             <div>
-                <label for="expected_outcomes" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label for="expected_outcomes" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                     Expected Outcomes <span class="text-red-500">*</span>
                 </label>
                 <textarea name="expected_outcomes" id="expected_outcomes" rows="4" required
-                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                          placeholder="Describe the expected outcomes and potential impact of your research...">{{ old('expected_outcomes') }}</textarea>
+                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
+                          placeholder="Describe the expected outcomes and potential impact of your research..."></textarea>
                 @error('expected_outcomes')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -161,7 +161,7 @@
 <div class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
     <div class="flex items-start space-x-4">
         <div class="p-2 bg-blue-500 rounded-lg flex-shrink-0">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
         </div>

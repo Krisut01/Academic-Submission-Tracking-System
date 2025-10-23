@@ -46,19 +46,19 @@
             <div class="mb-8 text-center">
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl shadow-2xl mb-6">
                     @if($documentType === 'proposal')
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-10 h-10 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     @elseif($documentType === 'approval_sheet')
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-10 h-10 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     @elseif($documentType === 'panel_assignment')
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-10 h-10 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
                     @else
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-10 h-10 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                     @endif
@@ -76,7 +76,7 @@
                 <div class="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-2xl shadow-sm">
                     <div class="flex items-center">
                         <div class="p-2 bg-green-500 rounded-xl shadow-lg mr-4">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
@@ -89,7 +89,7 @@
                 <div class="mb-8 p-6 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border border-red-200 dark:border-red-800 rounded-2xl shadow-sm">
                     <div class="flex items-center">
                         <div class="p-2 bg-red-500 rounded-xl shadow-lg mr-4">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
@@ -108,7 +108,7 @@
                     <div class="px-8 py-6 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-gray-200 dark:border-gray-700">
                         <div class="flex items-center space-x-4">
                             <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
                             </div>
@@ -121,11 +121,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Student ID -->
                                 <div>
-                                    <label for="student_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    <label for="student_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                                         Student ID <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="student_id" id="student_id" value="{{ old('student_id') }}" required
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
                                            placeholder="Enter your student ID">
                                     @error('student_id')
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -134,11 +134,11 @@
 
                                 <!-- Full Name -->
                                 <div>
-                                    <label for="full_name" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    <label for="full_name" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                                         Full Name <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="full_name" id="full_name" value="{{ old('full_name', auth()->user()->name) }}" required
-                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-300"
                                            placeholder="Enter your full name">
                                     @error('full_name')
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -147,7 +147,7 @@
 
                                 <!-- Course/Program -->
                                 <div>
-                                    <label for="course_program" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    <label for="course_program" class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
                                         Course / Program <span class="text-red-500">*</span>
                                     </label>
                                     <select name="course_program" id="course_program" required
@@ -220,7 +220,7 @@
                                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                            placeholder="Or enter adviser name manually">
                                 </div>
-                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Select from the dropdown or enter manually if not listed</p>
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Select from the dropdown or enter manually if not listed</p>
                                 @error('adviser_name') @error('adviser_id')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror @enderror
@@ -245,7 +245,7 @@
                     <div class="px-8 py-6 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-b border-gray-200 dark:border-gray-700">
                         <div class="flex items-center space-x-4">
                             <div class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                                 </svg>
                             </div>
@@ -264,10 +264,10 @@
                                         <span class="text-xl font-semibold text-gray-900 dark:text-gray-100 block mb-2">
                                             Upload Required Documents <span class="text-red-500">*</span>
                                         </span>
-                                        <span class="text-gray-500 dark:text-gray-400 block mb-4">
+                                        <span class="text-gray-600 dark:text-gray-300 block mb-4">
                                             Click to upload or drag and drop files here
                                         </span>
-                                        <span class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition">
+                                        <span class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-gray-900 dark:text-white rounded-xl transition shadow-sm hover:shadow-md border border-purple-600">
                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
@@ -276,7 +276,7 @@
                                     </label>
                                     <input id="files" name="files[]" type="file" class="sr-only" multiple required
                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="displaySelectedFiles(this)">
-                                    <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                                    <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">
                                         Supported formats: PDF, DOC, DOCX, JPG, PNG (Max 10MB each)
                                     </p>
                                 </div>
@@ -299,7 +299,7 @@
                     <div class="px-8 py-6 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-b border-gray-200 dark:border-gray-700">
                         <div class="flex items-center space-x-4">
                             <div class="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z"></path>
                                 </svg>
                             </div>
@@ -348,7 +348,7 @@
                         Cancel
                     </a>
                     <button type="submit" 
-                            class="submit-btn px-8 py-4 text-white rounded-xl font-bold text-lg shadow-lg">
+                            class="submit-btn px-8 py-4 text-gray-900 dark:text-white rounded-xl font-bold text-lg shadow-lg">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                         </svg>
