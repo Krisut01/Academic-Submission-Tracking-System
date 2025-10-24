@@ -25,8 +25,127 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Assign panel members and schedule thesis defense</p>
                 </div>
 
-                <form method="POST" action="{{ route('admin.panel.store') }}" class="p-6">
+                <form method="POST" action="{{ route('admin.panel.store') }}" class="p-6" id="panel-assignment-form">
                     @csrf
+                    <input type="hidden" name="form_submitted" value="1">
+                    
+                    <!-- Hidden field to track the original student request -->
+                    @if(isset($studentRequest))
+                        <input type="hidden" name="from_request_id" value="{{ $studentRequest->id }}">
+                    @endif
+
+
+                    <!-- Student Request Information -->
+                    @if(isset($studentRequest))
+                        <div class="mb-6 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl">
+                            <div class="flex items-start space-x-4">
+                                <div class="p-2 bg-blue-500 rounded-lg flex-shrink-0">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                                        📋 Creating Panel from Student Request
+                                    </h4>
+                                    <p class="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                                        This panel assignment is being created from <strong>{{ $studentRequest->user->name }}'s</strong> panel assignment request submitted on {{ $studentRequest->submission_date->format('F j, Y') }}.
+                                    </p>
+                                    
+                                    @if(!empty($preferredPanelMembers))
+                                        <div class="mt-4">
+                                            <h5 class="font-medium text-blue-800 dark:text-blue-200 mb-2">Student's Preferred Panel Members:</h5>
+                                            <div class="space-y-2">
+                                                @foreach($preferredPanelMembers as $key => $member)
+                                                    @if((isset($member['name']) && $member['name']) || (isset($member['id']) && $member['id']))
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
+                                                                {{ ucfirst(str_replace('_', ' ', str_replace('preferred_', '', $key))) }}
+                                                            </span>
+                                                            @if(isset($member['id']) && $member['id'])
+                                                                @php
+                                                                    $facultyMember = \App\Models\User::find($member['id']);
+                                                                @endphp
+                                                                @if($facultyMember)
+                                                                    <span class="text-sm text-blue-700 dark:text-blue-300 font-medium">{{ $facultyMember->name }}</span>
+                                                                    <span class="text-xs text-blue-600 dark:text-blue-400">({{ $facultyMember->email }})</span>
+                                                                    <span class="text-xs bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 px-2 py-1 rounded-full">✓ In System</span>
+                                                                @else
+                                                                    <span class="text-sm text-blue-700 dark:text-blue-300">{{ $member['name'] ?? 'Unknown Faculty' }}</span>
+                                                                    <span class="text-xs bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 px-2 py-1 rounded-full">⚠ Not Found</span>
+                                                                @endif
+                                                            @elseif(isset($member['name']) && $member['name'])
+                                                                <span class="text-sm text-blue-700 dark:text-blue-300">{{ $member['name'] }}</span>
+                                                                <span class="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300 px-2 py-1 rounded-full">Manual Entry</span>
+                                                            @endif
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                            <p class="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                                                💡 These are suggestions from the student. Faculty members in the system will be automatically pre-selected below.
+                                            </p>
+                                        </div>
+                                    @endif
+                                    
+                                    <!-- Student's Preferred Dates and Times -->
+                                    @if($studentRequest->preferred_dates || $studentRequest->preferred_time || $studentRequest->preferred_venue)
+                                        <div class="mt-4">
+                                            <h5 class="font-medium text-blue-800 dark:text-blue-200 mb-2">📅 Student's Preferred Schedule:</h5>
+                                            <div class="space-y-3">
+                                                @if($studentRequest->preferred_dates && is_array($studentRequest->preferred_dates))
+                                                    <div>
+                                                        <h6 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">Preferred Dates:</h6>
+                                                        <div class="space-y-1">
+                                                            @foreach($studentRequest->preferred_dates as $index => $date)
+                                                                @if($date)
+                                                                    <div class="flex items-center space-x-2">
+                                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200">
+                                                                            Option {{ $index + 1 }}
+                                                                        </span>
+                                                                        <span class="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                                                                            {{ \Carbon\Carbon::parse($date)->format('F j, Y') }}
+                                                                        </span>
+                                                                        <span class="text-xs text-blue-600 dark:text-blue-400">
+                                                                            ({{ \Carbon\Carbon::parse($date)->format('l') }})
+                                                                        </span>
+                                                                    </div>
+                                                                @endif
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                
+                                                @if($studentRequest->preferred_time)
+                                                    <div>
+                                                        <h6 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">Preferred Time:</h6>
+                                                        <span class="text-sm text-blue-700 dark:text-blue-300 font-medium">{{ $studentRequest->preferred_time }}</span>
+                                                    </div>
+                                                @endif
+                                                
+                                                @if($studentRequest->preferred_venue)
+                                                    <div>
+                                                        <h6 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">Preferred Venue:</h6>
+                                                        <span class="text-sm text-blue-700 dark:text-blue-300">{{ $studentRequest->preferred_venue }}</span>
+                                                    </div>
+                                                @endif
+                                                
+                                                @if($studentRequest->special_requirements)
+                                                    <div>
+                                                        <h6 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">Special Requirements:</h6>
+                                                        <span class="text-sm text-blue-700 dark:text-blue-300">{{ $studentRequest->special_requirements }}</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <p class="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                                                💡 Consider these preferences when scheduling the defense. You can use them as a starting point or choose different dates/times as needed.
+                                            </p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Student and Thesis Selection -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -106,13 +225,60 @@
                         </label>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($facultyMembers as $faculty)
-                                <label class="flex items-center p-4 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                                @php
+                                    // Check if this faculty member is preferred by the student
+                                    $isPreferred = false;
+                                    $preferredRole = '';
+                                    if (isset($preferredPanelMembers) && !empty($preferredPanelMembers)) {
+                                        foreach ($preferredPanelMembers as $key => $member) {
+                                            // Check by ID first (most accurate)
+                                            if (isset($member['id']) && $member['id'] == $faculty->id) {
+                                                $isPreferred = true;
+                                                $preferredRole = ucfirst(str_replace('_', ' ', str_replace('preferred_', '', $key)));
+                                                break;
+                                            } 
+                                            // Check by exact name match
+                                            elseif (isset($member['name']) && !empty($member['name'])) {
+                                                $memberName = trim($member['name']);
+                                                $facultyName = trim($faculty->name);
+                                                
+                                                // Exact match (case-insensitive)
+                                                if (strtolower($memberName) === strtolower($facultyName)) {
+                                                    $isPreferred = true;
+                                                    $preferredRole = ucfirst(str_replace('_', ' ', str_replace('preferred_', '', $key)));
+                                                    break;
+                                                }
+                                                
+                                                // Partial match (if faculty name contains the preferred name or vice versa)
+                                                if (stripos($facultyName, $memberName) !== false || stripos($memberName, $facultyName) !== false) {
+                                                    $isPreferred = true;
+                                                    $preferredRole = ucfirst(str_replace('_', ' ', str_replace('preferred_', '', $key))) . ' (partial match)';
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Pre-select if preferred by student or previously selected
+                                    $isChecked = in_array($faculty->id, old('panel_members', [])) || $isPreferred;
+                                @endphp
+                                
+                                <label class="flex items-center p-4 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors {{ $isPreferred ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : '' }}">
                                     <input type="checkbox" name="panel_members[]" value="{{ $faculty->id }}"
-                                           {{ in_array($faculty->id, old('panel_members', [])) ? 'checked' : '' }}
+                                           {{ $isChecked ? 'checked' : '' }}
                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $faculty->name }}</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $faculty->email }}</p>
+                                    <div class="ml-3 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $faculty->name }}</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $faculty->email }}</p>
+                                            </div>
+                                            @if($isPreferred)
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
+                                                    Student's {{ $preferredRole }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </label>
                             @endforeach
@@ -131,9 +297,32 @@
                                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">Select Panel Chair</option>
                             @foreach($facultyMembers as $faculty)
+                                @php
+                                    // Check if this faculty is the preferred chair
+                                    $isPreferredChair = false;
+                                    if (isset($preferredPanelMembers['preferred_chair'])) {
+                                        $preferredChair = $preferredPanelMembers['preferred_chair'];
+                                        // Check by ID first
+                                        if (isset($preferredChair['id']) && $preferredChair['id'] == $faculty->id) {
+                                            $isPreferredChair = true;
+                                        }
+                                        // Check by name match
+                                        elseif (isset($preferredChair['name']) && !empty($preferredChair['name'])) {
+                                            $chairName = trim($preferredChair['name']);
+                                            $facultyName = trim($faculty->name);
+                                            if (strtolower($chairName) === strtolower($facultyName) || 
+                                                stripos($facultyName, $chairName) !== false || 
+                                                stripos($chairName, $facultyName) !== false) {
+                                                $isPreferredChair = true;
+                                            }
+                                        }
+                                    }
+                                    
+                                    $isSelected = old('panel_chair_id') == $faculty->id || $isPreferredChair;
+                                @endphp
                                 <option value="{{ $faculty->id }}" 
-                                        {{ old('panel_chair_id') == $faculty->id ? 'selected' : '' }}>
-                                    {{ $faculty->name }} ({{ $faculty->email }})
+                                        {{ $isSelected ? 'selected' : '' }}>
+                                    {{ $faculty->name }} ({{ $faculty->email }}){{ $isPreferredChair ? ' ⭐ Student\'s Preferred Chair' : '' }}
                                 </option>
                             @endforeach
                         </select>
@@ -158,6 +347,25 @@
                             @endforeach
                         </select>
                         @error('secretary_id')
+                            <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Defense Type Selection -->
+                    <div class="mb-8">
+                        <label for="defense_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Defense Type *
+                        </label>
+                        <select name="defense_type" id="defense_type" required
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <option value="">Select Defense Type</option>
+                            <option value="proposal_defense" {{ old('defense_type') === 'proposal_defense' ? 'selected' : '' }}>Proposal Defense</option>
+                            <option value="final_defense" {{ old('defense_type') === 'final_defense' ? 'selected' : '' }}>Final Defense</option>
+                            <option value="redefense" {{ old('defense_type') === 'redefense' ? 'selected' : '' }}>Re-defense</option>
+                            <option value="oral_defense" {{ old('defense_type') === 'oral_defense' ? 'selected' : '' }}>Oral Defense</option>
+                            <option value="thesis_defense" {{ old('defense_type') === 'thesis_defense' ? 'selected' : '' }}>Thesis Defense</option>
+                        </select>
+                        @error('defense_type')
                             <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -288,8 +496,15 @@
         // Initialize count
         updateMemberCount();
 
-        // Form validation
+        // Form validation and double-submission prevention
+        let formSubmitted = false;
         document.querySelector('form').addEventListener('submit', function(e) {
+            // Prevent double submission
+            if (formSubmitted) {
+                e.preventDefault();
+                return false;
+            }
+            
             const panelMembers = document.querySelectorAll('input[name="panel_members[]"]:checked');
             const panelChair = document.getElementById('panel_chair_id').value;
             
@@ -321,6 +536,55 @@
                 alert('Panel chair must be one of the selected panel members.');
                 return;
             }
+            
+            // Mark form as submitted and disable submit button
+            formSubmitted = true;
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<svg class="w-5 h-5 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Creating...';
+            }
         });
+
+        // Pre-fill defense date and venue with student's preferences
+        @if(isset($studentRequest))
+            // Pre-fill defense date
+            @if($studentRequest->preferred_dates && is_array($studentRequest->preferred_dates) && !empty($studentRequest->preferred_dates[0]))
+                const firstPreferredDate = '{{ $studentRequest->preferred_dates[0] }}';
+                const preferredTime = '{{ $studentRequest->preferred_time ?? "09:00" }}';
+                
+                if (firstPreferredDate) {
+                    // Convert date to datetime-local format
+                    const date = new Date(firstPreferredDate);
+                    const time = preferredTime.split(':');
+                    date.setHours(parseInt(time[0]) || 9, parseInt(time[1]) || 0);
+                    
+                    const datetimeLocal = date.toISOString().slice(0, 16);
+                    document.getElementById('defense_date').value = datetimeLocal;
+                    
+                    // Show a notification that the date was pre-filled
+                    const dateField = document.getElementById('defense_date');
+                    const dateNotification = document.createElement('div');
+                    dateNotification.className = 'mt-2 p-2 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 text-sm rounded-lg';
+                    dateNotification.innerHTML = '✅ Pre-filled with student\'s first preferred date. You can change this if needed.';
+                    dateField.parentNode.appendChild(dateNotification);
+                }
+            @endif
+            
+            // Pre-fill defense venue
+            @if($studentRequest->preferred_venue)
+                const preferredVenue = '{{ $studentRequest->preferred_venue }}';
+                if (preferredVenue) {
+                    document.getElementById('defense_venue').value = preferredVenue;
+                    
+                    // Show a notification that the venue was pre-filled
+                    const venueField = document.getElementById('defense_venue');
+                    const venueNotification = document.createElement('div');
+                    venueNotification.className = 'mt-2 p-2 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 text-sm rounded-lg';
+                    venueNotification.innerHTML = '✅ Pre-filled with student\'s preferred venue. You can change this if needed.';
+                    venueField.parentNode.appendChild(venueNotification);
+                }
+            @endif
+        @endif
     </script>
 </x-app-layout>

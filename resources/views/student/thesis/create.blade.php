@@ -99,7 +99,7 @@
             @endif
 
             <!-- Main Form -->
-            <form method="POST" action="{{ route('student.thesis.store') }}" enctype="multipart/form-data" id="thesisForm" class="space-y-8">
+            <form method="POST" action="{{ route('student.thesis.store') }}" enctype="multipart/form-data" id="thesisForm" class="space-y-8" autocomplete="off">
                 @csrf
                 <input type="hidden" name="document_type" value="{{ $documentType }}">
 
@@ -422,5 +422,54 @@
                 document.getElementById('adviser_id').value = '';
             }
         });
+        
+        // Clear any suspicious data from form fields
+        const suspiciousText = "in the faculty where the adviser is assigned of the students, make sure that the adviser is authoroize to download t he document of the students whenver the adviser is reviewing it";
+        
+        // List of fields to check and clear
+        const fieldsToCheck = [
+            'title', 'description', 'panel_justification', 'required_specializations', 
+            'special_requirements', 'comments', 'remarks'
+        ];
+        
+        fieldsToCheck.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (field && field.value.includes(suspiciousText)) {
+                field.value = '';
+                console.log('Cleared suspicious data from field:', fieldName);
+            }
+        });
+        
+        // Add form validation before submission
+        document.getElementById('thesisForm').addEventListener('submit', function(e) {
+            let hasSuspiciousData = false;
+            
+            fieldsToCheck.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (field && field.value.includes(suspiciousText)) {
+                    hasSuspiciousData = true;
+                    field.style.borderColor = 'red';
+                    field.style.backgroundColor = '#fee2e2';
+                }
+            });
+            
+            if (hasSuspiciousData) {
+                e.preventDefault();
+                alert('Please fill out the form fields with proper information. Some fields contain invalid data.');
+                return false;
+            }
+        });
+        
+        // Clear form on page load for panel assignment
+        @if($documentType === 'panel_assignment')
+            // Clear specific fields that might have wrong data
+            const fieldsToClear = ['title', 'description', 'panel_justification', 'required_specializations', 'special_requirements'];
+            fieldsToClear.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (field && field.value.trim() === '') {
+                    field.value = '';
+                }
+            });
+        @endif
     </script>
 </x-app-layout> 

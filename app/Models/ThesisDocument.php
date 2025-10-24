@@ -43,6 +43,17 @@ class ThesisDocument extends Model
         'file_naming_prefix',
         'version_number',
         'status_history',
+        'defense_status',
+        'defense_notes',
+        'defense_grade',
+        'defense_confirmed_by',
+        'defense_confirmed_at',
+        'preferred_dates',
+        'preferred_time',
+        'preferred_venue',
+        'special_requirements',
+        'required_specializations',
+        'panel_justification',
     ];
 
     protected $casts = [
@@ -51,13 +62,16 @@ class ThesisDocument extends Model
         'panel_members' => 'array',
         'status_history' => 'array',
         'requested_schedule' => 'array',
+        'preferred_dates' => 'array',
         'submission_date' => 'date',
         'approval_date' => 'date',
         'defense_date' => 'date',
         'reviewed_at' => 'datetime',
+        'defense_confirmed_at' => 'datetime',
         'final_revisions_completed' => 'boolean',
         'has_plagiarism_report' => 'boolean',
         'plagiarism_percentage' => 'decimal:2',
+        'defense_grade' => 'decimal:2',
     ];
 
     /**
@@ -82,6 +96,22 @@ class ThesisDocument extends Model
     public function adviser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'adviser_id');
+    }
+
+    /**
+     * Get panel assignments for this thesis document.
+     */
+    public function panelAssignments()
+    {
+        return $this->hasMany(PanelAssignment::class);
+    }
+
+    /**
+     * Get the user who confirmed the defense.
+     */
+    public function defenseConfirmedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'defense_confirmed_by');
     }
 
     /**
@@ -133,7 +163,9 @@ class ThesisDocument extends Model
      */
     public function generateFileNamingPrefix(): string
     {
-        $date = $this->submission_date ? $this->submission_date->format('Y-m-d') : now()->format('Y-m-d');
+        $date = $this->submission_date && $this->submission_date instanceof \Carbon\Carbon 
+            ? $this->submission_date->format('Y-m-d') 
+            : now()->format('Y-m-d');
         return "{$this->student_id}_{$this->document_type}_{$date}";
     }
 
@@ -171,6 +203,47 @@ class ThesisDocument extends Model
     }
 
     /**
+     * Check if a faculty member has access to this document
+     */
+    public function facultyHasAccess(int $facultyId): bool
+    {
+        // Faculty has access if they are:
+        // 1. The adviser
+        // 2. The reviewer
+        // 3. Part of any panel assignment (chair, secretary, or member)
+        
+        if ($this->adviser_id == $facultyId || $this->reviewed_by == $facultyId) {
+            return true;
+        }
+        
+        // Check panel assignments directly linked to this document
+        foreach ($this->panelAssignments as $panel) {
+            if ($panel->panel_chair_id == $facultyId || 
+                $panel->secretary_id == $facultyId || 
+                in_array($facultyId, $panel->panel_member_ids)) {
+                return true;
+            }
+        }
+        
+        // For final manuscripts, also check panel assignments for the student
+        if ($this->document_type === 'final_manuscript') {
+            $studentPanelAssignments = \App\Models\PanelAssignment::where('student_id', $this->user_id)
+                ->where(function ($query) use ($facultyId) {
+                    $query->where('panel_chair_id', $facultyId)
+                          ->orWhere('secretary_id', $facultyId)
+                          ->orWhereJsonContains('panel_members', (string)$facultyId);
+                })
+                ->exists();
+            
+            if ($studentPanelAssignments) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
      * Get panel members as formatted list
      */
     public function getFormattedPanelMembersAttribute(): string
@@ -183,7 +256,7 @@ class ThesisDocument extends Model
             return implode(', ', $this->panel_members);
         }
         
-        return $this->panel_members;
+        return (string) $this->panel_members;
     }
 
     /**

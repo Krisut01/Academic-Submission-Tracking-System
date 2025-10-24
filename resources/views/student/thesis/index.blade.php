@@ -358,6 +358,81 @@
                 </div>
             </div>
 
+            <!-- Final Defense Status -->
+            @php
+                $panelAssignment = \App\Models\PanelAssignment::where('student_id', Auth::id())->first();
+            @endphp
+            
+            <div class="thesis-card bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
+                <div class="p-8 card-content">
+                    @if($panelAssignment)
+                        <!-- Defense Scheduled -->
+                        <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg mb-6 mx-auto">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">Final Defense Scheduled</h3>
+                        <p class="text-base text-gray-600 dark:text-gray-400 mb-6 text-center leading-relaxed">Your thesis defense has been scheduled. Review the details and prepare for your presentation.</p>
+                        
+                        <!-- Defense Summary -->
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 mb-8">
+                            <div class="text-center">
+                                <p class="text-lg font-bold text-green-800 dark:text-green-300">
+                                    {{ $panelAssignment->defense_date->format('F j, Y') }}
+                                </p>
+                                <p class="text-sm text-green-700 dark:text-green-400">
+                                    {{ $panelAssignment->defense_date->format('g:i A') }} • {{ $panelAssignment->defense_venue }}
+                                </p>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 mt-2">
+                                    Status: {{ ucfirst($panelAssignment->status) }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <a href="{{ route('student.thesis.defense') }}" 
+                           class="thesis-btn defense w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"></path>
+                            </svg>
+                            View Defense Details
+                        </a>
+                    @else
+                        <!-- Defense Not Scheduled -->
+                        <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl shadow-lg mb-6 mx-auto">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"></path>
+                            </svg>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">Final Defense</h3>
+                        <p class="text-base text-gray-600 dark:text-gray-400 mb-6 text-center leading-relaxed">Your defense will be scheduled after all requirements are completed and approved.</p>
+                        
+                        <!-- Status Info -->
+                        <div class="bg-gray-50 dark:bg-gray-700/30 rounded-2xl p-4 mb-8">
+                            <div class="text-center">
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Status</p>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
+                                    Awaiting Schedule
+                                </span>
+                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                                    Complete all submissions and wait for admin to schedule your defense
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <a href="{{ route('student.thesis.defense') }}" 
+                           class="thesis-btn w-full bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Check Defense Status
+                        </a>
+                    @endif
+                </div>
+            </div>
+
             <!-- Enhanced Quick Links & Information -->
             <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                 <div class="px-8 py-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">

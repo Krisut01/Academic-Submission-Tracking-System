@@ -112,6 +112,9 @@
                             <x-dropdown-link :href="route('faculty.thesis.reviews')">
                                 📂 {{ __('Review Thesis') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('faculty.panel-assignments.index')">
+                                👥 {{ __('Panel Assignments') }}
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('faculty.thesis.progress')">
                                 🗒️ {{ __('Track Progress') }}
                             </x-dropdown-link>
@@ -124,6 +127,9 @@
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('student.thesis.index')">
                                 📄 {{ __('Thesis Documents') }}
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('student.thesis.panel-assignments')">
+                                👥 {{ __('Panel Assignments') }}
                             </x-dropdown-link>
                         @endif
 

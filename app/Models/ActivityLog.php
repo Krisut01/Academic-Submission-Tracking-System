@@ -86,12 +86,31 @@ class ActivityLog extends Model
         
         return match($eventType) {
             'form_submitted' => "{$userName} submitted a new {$model->form_type} form",
+            'thesis_submitted' => self::generateThesisSubmissionDescription($userName, $model),
             'thesis_reviewed' => "{$userName} reviewed thesis document: {$model->title}",
             'user_updated' => "{$userName} updated user account: {$model->name}",
             'role_changed' => "{$userName} changed user role for: {$model->name}",
             'status_updated' => "{$userName} updated status of {$modelName} to: {$model->status}",
-            default => "{$userName} {$action} {$modelName} (ID: {$model->id})"
+            default => "{$userName} {$action} {$modelName}"
         };
+    }
+
+    /**
+     * Generate user-friendly thesis submission description
+     */
+    private static function generateThesisSubmissionDescription(string $userName, Model $model): string
+    {
+        $documentTypeLabels = [
+            'proposal' => 'Thesis Proposal',
+            'approval_sheet' => 'Approval Sheet',
+            'panel_assignment' => 'Panel Assignment Request',
+            'final_manuscript' => 'Final Manuscript'
+        ];
+
+        $documentType = $documentTypeLabels[$model->document_type] ?? ucfirst(str_replace('_', ' ', $model->document_type));
+        $title = $model->title ? ": {$model->title}" : '';
+        
+        return "{$userName} submitted {$documentType}{$title}";
     }
 
     /**

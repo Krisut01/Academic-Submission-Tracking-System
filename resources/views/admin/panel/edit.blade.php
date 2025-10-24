@@ -114,6 +114,25 @@
                         @enderror
                     </div>
 
+                    <!-- Defense Type Selection -->
+                    <div class="mb-8">
+                        <label for="defense_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Defense Type *
+                        </label>
+                        <select name="defense_type" id="defense_type" required
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <option value="">Select Defense Type</option>
+                            <option value="proposal_defense" {{ old('defense_type', $assignment->defense_type) === 'proposal_defense' ? 'selected' : '' }}>Proposal Defense</option>
+                            <option value="final_defense" {{ old('defense_type', $assignment->defense_type) === 'final_defense' ? 'selected' : '' }}>Final Defense</option>
+                            <option value="redefense" {{ old('defense_type', $assignment->defense_type) === 'redefense' ? 'selected' : '' }}>Re-defense</option>
+                            <option value="oral_defense" {{ old('defense_type', $assignment->defense_type) === 'oral_defense' ? 'selected' : '' }}>Oral Defense</option>
+                            <option value="thesis_defense" {{ old('defense_type', $assignment->defense_type) === 'thesis_defense' ? 'selected' : '' }}>Thesis Defense</option>
+                        </select>
+                        @error('defense_type')
+                            <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Defense Details -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                         <div>
@@ -151,46 +170,16 @@
                             <select name="status" id="status" required 
                                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <option value="scheduled" {{ old('status', $assignment->status) === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                                <option value="completed" {{ old('status', $assignment->status) === 'completed' ? 'selected' : '' }}>Completed</option>
                                 <option value="postponed" {{ old('status', $assignment->status) === 'postponed' ? 'selected' : '' }}>Postponed</option>
                                 <option value="cancelled" {{ old('status', $assignment->status) === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                <!-- 'completed' removed - Faculty handles completion and grading -->
                             </select>
                             @error('status')
                                 <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
-                            <label for="result" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Result
-                            </label>
-                            <select name="result" id="result" 
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                <option value="">Select Result</option>
-                                <option value="passed" {{ old('result', $assignment->result) === 'passed' ? 'selected' : '' }}>Passed</option>
-                                <option value="failed" {{ old('result', $assignment->result) === 'failed' ? 'selected' : '' }}>Failed</option>
-                                <option value="conditional" {{ old('result', $assignment->result) === 'conditional' ? 'selected' : '' }}>Conditional</option>
-                                <option value="pending" {{ old('result', $assignment->result) === 'pending' ? 'selected' : '' }}>Pending</option>
-                            </select>
-                            @error('result')
-                                <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ $message }}</p>
-                            @enderror
                         </div>
-                    </div>
-
-                    <!-- Final Grade -->
-                    <div class="mb-8">
-                        <label for="final_grade" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Final Grade
-                        </label>
-                        <input type="number" name="final_grade" id="final_grade" 
-                               value="{{ old('final_grade', $assignment->final_grade) }}" 
-                               min="0" max="100" step="0.01"
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="Enter final grade (0-100)">
-                        @error('final_grade')
-                            <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Defense Instructions -->
@@ -206,18 +195,6 @@
                         @enderror
                     </div>
 
-                    <!-- Panel Feedback -->
-                    <div class="mb-8">
-                        <label for="panel_feedback" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Panel Feedback
-                        </label>
-                        <textarea name="panel_feedback" id="panel_feedback" rows="4"
-                                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                  placeholder="Panel feedback and comments (optional)">{{ old('panel_feedback', $assignment->panel_feedback) }}</textarea>
-                        @error('panel_feedback')
-                            <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
 
                     <!-- Form Actions -->
                     <div class="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -264,21 +241,7 @@
         // Initialize count
         updateMemberCount();
 
-        // Show/hide result field based on status
-        document.getElementById('status').addEventListener('change', function() {
-            const resultField = document.getElementById('result');
-            const gradeField = document.getElementById('final_grade');
-            
-            if (this.value === 'completed') {
-                resultField.parentElement.style.display = 'block';
-                gradeField.parentElement.style.display = 'block';
-                resultField.required = true;
-            } else {
-                resultField.parentElement.style.display = 'block';
-                gradeField.parentElement.style.display = 'block';
-                resultField.required = false;
-            }
-        });
+        // Admin only handles scheduling - no grading fields
 
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {

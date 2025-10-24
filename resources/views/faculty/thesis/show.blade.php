@@ -135,7 +135,7 @@
                                                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ number_format($file['size'] / 1024, 1) }} KB</p>
                                                         </div>
                                                     </div>
-                                                    <a href="{{ route('student.thesis.download', [$document, $index]) }}" 
+                                                    <a href="{{ route('faculty.thesis.download', [$document, $index]) }}" 
                                                        class="bg-blue-600 hover:bg-blue-700 text-gray-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200">
                                                         Download
                                                     </a>

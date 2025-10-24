@@ -40,7 +40,7 @@ Route::get('/dashboard', function () {
                 'pending_thesis' => $hasThesisDocuments ? $user->thesisDocuments()->where('status', 'pending')->count() : 0,
                 'approved_thesis' => $hasThesisDocuments ? $user->thesisDocuments()->where('status', 'approved')->count() : 0,
                 'unread_notifications' => $hasNotifications ? $user->unreadNotifications()->count() : 0,
-                'recent_activities' => $hasActivityLogs ? $user->activityLogs()->orderBy('created_at', 'desc')->take(5)->get() : collect(),
+                'recent_activities' => $hasActivityLogs ? $user->activityLogs()->with('user')->orderBy('created_at', 'desc')->take(5)->get() : collect(),
                 'latest_form' => $hasAcademicForms ? $user->academicForms()->latest()->first() : null,
                 'latest_thesis' => $hasThesisDocuments ? $user->thesisDocuments()->latest()->first() : null,
                 'forms_this_week' => $hasAcademicForms ? $user->academicForms()->where('created_at', '>=', now()->subWeek())->count() : 0,
@@ -58,6 +58,7 @@ Route::get('/dashboard', function () {
             $hasUsers = Schema::hasTable('users');
             $hasPanelAssignments = Schema::hasTable('panel_assignments');
             $hasActivityLogs = Schema::hasTable('activity_logs');
+            $hasNotifications = Schema::hasTable('notifications');
             
             $totalSubmissions = 0;
             if ($hasAcademicForms) $totalSubmissions += \App\Models\AcademicForm::count();
@@ -75,8 +76,10 @@ Route::get('/dashboard', function () {
                 'scheduled_defenses' => $hasPanelAssignments ? \App\Models\PanelAssignment::where('status', 'scheduled')->count() : 0,
                 'overdue_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')
                     ->where('created_at', '<=', now()->subDays(5))->count() : 0,
-                'recent_activities' => $hasActivityLogs ? \App\Models\ActivityLog::orderBy('created_at', 'desc')->take(10)->get() : collect(),
+                'recent_activities' => $hasActivityLogs ? \App\Models\ActivityLog::with('user')->orderBy('created_at', 'desc')->take(10)->get() : collect(),
                 'submissions_this_week' => $submissionsThisWeek,
+                'unread_notifications' => $hasNotifications ? \App\Models\Notification::where('user_id', $user->id)
+                    ->whereNull('read_at')->count() : 0,
             ];
         }
     } catch (\Exception $e) {
@@ -114,8 +117,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/dashboard/stats', [App\Http\Controllers\Admin\DashboardController::class, 'getStats'])->name('admin.dashboard.stats');
     Route::get('/admin/dashboard/activity', [App\Http\Controllers\Admin\DashboardController::class, 'getRecentActivity'])->name('admin.dashboard.activity');
 
-    Route::get('/faculty/dashboard', function () {
-        if (Auth::user()->role !== 'faculty') {
+    Route::get('/faculty/dashboard', [App\Http\Controllers\Faculty\DashboardController::class, 'index'])->name('faculty.dashboard');
+
+    Route::get('/student/dashboard', function () {
+        if (Auth::user()->role !== 'student') {
             abort(403, 'Unauthorized access.');
         }
         
@@ -124,46 +129,202 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         try {
             // Check if tables exist before querying
+            $hasAcademicForms = Schema::hasTable('academic_forms');
             $hasThesisDocuments = Schema::hasTable('thesis_documents');
-            $hasUsers = Schema::hasTable('users');
             $hasNotifications = Schema::hasTable('notifications');
+            $hasActivityLogs = Schema::hasTable('activity_logs');
+            $hasPanelAssignments = Schema::hasTable('panel_assignments');
             
-            // Get real faculty data from database with safety checks
+            // Get defense schedule data for the student - more robust checking
+            $upcomingDefense = null;
+            $defenseNotification = null;
+            if ($hasPanelAssignments) {
+                // Check for any scheduled defense (not just upcoming ones)
+                $upcomingDefense = \App\Models\PanelAssignment::where('student_id', $user->id)
+                    ->where('status', 'scheduled')
+                    ->where('defense_date', '>', now())
+                    ->orderBy('defense_date', 'asc')
+                    ->first();
+                
+                // Also check for recently scheduled defenses (within last 30 days) that might be relevant
+                $recentDefense = \App\Models\PanelAssignment::where('student_id', $user->id)
+                    ->where('status', 'scheduled')
+                    ->where('defense_date', '>=', now()->subDays(30))
+                    ->where('defense_date', '<=', now()->addDays(7))
+                    ->orderBy('defense_date', 'asc')
+                    ->first();
+                
+                // Use the most relevant defense (upcoming or recent)
+                $relevantDefense = $upcomingDefense ?? $recentDefense;
+                
+                if ($relevantDefense) {
+                    $defenseNotification = [
+                        'title' => 'Defense Scheduled',
+                        'message' => "Your {$relevantDefense->defense_type_label} is scheduled for {$relevantDefense->defense_date->format('F j, Y \a\t g:i A')}",
+                        'defense_date' => $relevantDefense->defense_date,
+                        'venue' => $relevantDefense->defense_venue,
+                        'defense_type' => $relevantDefense->defense_type_label,
+                        'panel_chair' => $relevantDefense->panelChair?->name,
+                        'secretary' => $relevantDefense->secretary?->name,
+                        'instructions' => $relevantDefense->defense_instructions,
+                        'assignment_id' => $relevantDefense->id,
+                        'is_upcoming' => $relevantDefense->defense_date > now(),
+                        'days_until' => $relevantDefense->defense_date > now() ? $relevantDefense->defense_date->diffInDays(now()) : 0
+                    ];
+                }
+            }
+            
+            // Get comprehensive research progress data from database
+            $thesisDocuments = $hasThesisDocuments ? $user->thesisDocuments()->with(['reviewer', 'adviser', 'defenseConfirmedBy'])->get() : collect();
+            $academicForms = $hasAcademicForms ? $user->academicForms()->get() : collect();
+            
+            // Get panel assignments for this student
+            $panelAssignments = \App\Models\PanelAssignment::where('student_id', $user->id)->get();
+            
+            // Calculate research progress milestones based on actual database data
+            $milestones = [
+                'proposal_submitted' => $thesisDocuments->where('document_type', 'proposal')->isNotEmpty(),
+                'proposal_approved' => $thesisDocuments->where('document_type', 'proposal')->where('status', 'approved')->isNotEmpty(),
+                'approval_sheet_submitted' => $thesisDocuments->where('document_type', 'approval_sheet')->isNotEmpty(),
+                'approval_sheet_approved' => $thesisDocuments->where('document_type', 'approval_sheet')->where('status', 'approved')->isNotEmpty(),
+                'panel_assigned' => $thesisDocuments->where('document_type', 'panel_assignment')->isNotEmpty(),
+                'defense_scheduled' => $panelAssignments->where('status', 'scheduled')->isNotEmpty() || $panelAssignments->where('status', 'completed')->isNotEmpty(),
+                'defense_completed' => $panelAssignments->where('status', 'completed')->isNotEmpty(),
+                'final_manuscript_submitted' => $thesisDocuments->where('document_type', 'final_manuscript')->isNotEmpty(),
+                'final_manuscript_approved' => $thesisDocuments->where('document_type', 'final_manuscript')->where('status', 'approved')->isNotEmpty(),
+            ];
+            
+            // Calculate progress percentage
+            $completedMilestones = collect($milestones)->filter()->count();
+            $totalMilestones = count($milestones);
+            $progressPercentage = $totalMilestones > 0 ? round(($completedMilestones / $totalMilestones) * 100) : 0;
+            
+            // Get current phase based on database data
+            $currentPhase = 'Not Started';
+            if ($milestones['final_manuscript_approved']) {
+                $currentPhase = 'Completed';
+            } elseif ($milestones['final_manuscript_submitted']) {
+                $currentPhase = 'Final Review';
+            } elseif ($milestones['defense_completed']) {
+                $currentPhase = 'Final Manuscript';
+            } elseif ($milestones['defense_scheduled']) {
+                $currentPhase = 'Defense Scheduled';
+            } elseif ($milestones['panel_assigned']) {
+                $currentPhase = 'Panel Assignment';
+            } elseif ($milestones['approval_sheet_approved']) {
+                $currentPhase = 'Panel Assignment Request';
+            } elseif ($milestones['approval_sheet_submitted']) {
+                $currentPhase = 'Approval Sheet Review';
+            } elseif ($milestones['proposal_approved']) {
+                $currentPhase = 'Approval Sheet';
+            } elseif ($milestones['proposal_submitted']) {
+                $currentPhase = 'Proposal Review';
+            }
+            
+            // Get pending actions based on actual database state
+            $pendingActions = [];
+            if ($milestones['proposal_submitted'] && !$milestones['proposal_approved']) {
+                $pendingActions[] = [
+                    'type' => 'proposal_review',
+                    'title' => 'Proposal Under Review',
+                    'description' => 'Your proposal is being reviewed by faculty',
+                    'status' => 'pending',
+                    'priority' => 'high'
+                ];
+            }
+            if ($milestones['approval_sheet_submitted'] && !$milestones['approval_sheet_approved']) {
+                $pendingActions[] = [
+                    'type' => 'approval_sheet_review',
+                    'title' => 'Approval Sheet Under Review',
+                    'description' => 'Your approval sheet is being reviewed',
+                    'status' => 'pending',
+                    'priority' => 'high'
+                ];
+            }
+            if ($milestones['defense_scheduled']) {
+                $pendingActions[] = [
+                    'type' => 'defense_preparation',
+                    'title' => 'Defense Preparation',
+                    'description' => 'Prepare for your upcoming defense',
+                    'status' => 'upcoming',
+                    'priority' => 'urgent'
+                ];
+            }
+            
+            // Get latest activity from database
+            $latestActivity = collect();
+            if ($hasActivityLogs) {
+                $latestActivity = $user->activityLogs()
+                    ->with('user')
+                    ->orderBy('created_at', 'desc')
+                    ->take(10)
+                    ->get();
+            }
+            
+            // Get real student data from database with safety checks
             $dashboardData = [
-                'pending_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')->count() : 0,
-                'completed_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('reviewed_by', $user->id)->count() : 0,
-                'assigned_students' => $hasUsers && $hasThesisDocuments ? \App\Models\User::where('role', 'student')
-                    ->whereHas('thesisDocuments', function($q) use ($user) {
-                        $q->where('reviewed_by', $user->id);
-                    })->count() : 0,
-                'urgent_reviews' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')
-                    ->where('created_at', '<=', now()->subDays(5))->count() : 0,
-                'recent_submissions' => $hasThesisDocuments ? \App\Models\ThesisDocument::where('status', 'pending')
-                    ->with('user')->orderBy('created_at', 'desc')->take(5)->get() : collect(),
-                'avg_review_time' => 2.5, // This would need more complex calculation
+                'total_forms' => $hasAcademicForms ? $user->academicForms()->count() : 0,
+                'total_thesis_documents' => $hasThesisDocuments ? $user->thesisDocuments()->count() : 0,
+                'pending_forms' => $hasAcademicForms ? $user->academicForms()->where('status', 'pending')->count() : 0,
+                'approved_forms' => $hasAcademicForms ? $user->academicForms()->where('status', 'approved')->count() : 0,
+                'pending_thesis' => $hasThesisDocuments ? $user->thesisDocuments()->where('status', 'pending')->count() : 0,
+                'approved_thesis' => $hasThesisDocuments ? $user->thesisDocuments()->where('status', 'approved')->count() : 0,
                 'unread_notifications' => $hasNotifications ? $user->unreadNotifications()->count() : 0,
+                'recent_activities' => $latestActivity,
+                'latest_form' => $hasAcademicForms ? $user->academicForms()->latest()->first() : null,
+                'latest_thesis' => $hasThesisDocuments ? $user->thesisDocuments()->latest()->first() : null,
+                'forms_this_week' => $hasAcademicForms ? $user->academicForms()->where('created_at', '>=', now()->subWeek())->count() : 0,
+                'thesis_this_week' => $hasThesisDocuments ? $user->thesisDocuments()->where('created_at', '>=', now()->subWeek())->count() : 0,
+                'current_thesis_progress' => $hasThesisDocuments ? $user->thesisDocuments()
+                    ->whereIn('status', ['under_review', 'approved', 'pending'])
+                    ->orderBy('created_at', 'desc')
+                    ->first() : null,
+                'upcoming_defense' => $upcomingDefense,
+                'defense_notification' => $defenseNotification,
+                // Enhanced research progress data from database
+                'research_progress' => [
+                    'milestones' => $milestones,
+                    'progress_percentage' => $progressPercentage,
+                    'current_phase' => $currentPhase,
+                    'completed_milestones' => $completedMilestones,
+                    'total_milestones' => $totalMilestones,
+                    'pending_actions' => $pendingActions,
+                    'all_documents' => $thesisDocuments,
+                    'all_forms' => $academicForms,
+                ]
             ];
         } catch (\Exception $e) {
             // If any error occurs, provide safe default values
             $dashboardData = [
-                'pending_reviews' => 0,
-                'completed_reviews' => 0,
-                'assigned_students' => 0,
-                'urgent_reviews' => 0,
-                'recent_submissions' => collect(),
-                'avg_review_time' => 0,
+                'total_forms' => 0,
+                'total_thesis_documents' => 0,
+                'pending_forms' => 0,
+                'approved_forms' => 0,
+                'pending_thesis' => 0,
+                'approved_thesis' => 0,
                 'unread_notifications' => 0,
+                'recent_activities' => collect(),
+                'latest_form' => null,
+                'latest_thesis' => null,
+                'forms_this_week' => 0,
+                'thesis_this_week' => 0,
+                'current_thesis_progress' => null,
+                'upcoming_defense' => null,
+                'defense_notification' => null,
+                'research_progress' => [
+                    'milestones' => [],
+                    'progress_percentage' => 0,
+                    'current_phase' => 'Not Started',
+                    'completed_milestones' => 0,
+                    'total_milestones' => 0,
+                    'pending_actions' => [],
+                    'all_documents' => collect(),
+                    'all_forms' => collect(),
+                ]
             ];
         }
         
-        return view('faculty.dashboard', compact('dashboardData'));
-    })->name('faculty.dashboard');
-
-    Route::get('/student/dashboard', function () {
-        if (Auth::user()->role !== 'student') {
-            abort(403, 'Unauthorized access.');
-        }
-        return view('dashboard', ['userRole' => 'student']);
+        return view('dashboard', compact('dashboardData'));
     })->name('student.dashboard');
 });
 
@@ -181,8 +342,15 @@ Route::middleware(['auth', 'verified'])->prefix('student')->name('student.')->gr
     Route::get('/thesis/create', [ThesisDocumentController::class, 'create'])->name('thesis.create');
     Route::post('/thesis', [ThesisDocumentController::class, 'store'])->name('thesis.store');
     Route::get('/thesis/history', [ThesisDocumentController::class, 'history'])->name('thesis.history');
+    Route::get('/thesis/defense', [ThesisDocumentController::class, 'defense'])->name('thesis.defense');
+    Route::get('/thesis/panel-assignments', [ThesisDocumentController::class, 'panelAssignments'])->name('thesis.panel-assignments');
+    Route::get('/thesis/panel-assignments/{panelAssignment}', [ThesisDocumentController::class, 'showPanelAssignment'])->name('thesis.panel-assignment.show');
     Route::get('/thesis/{document}', [ThesisDocumentController::class, 'show'])->name('thesis.show');
+    Route::get('/thesis/{document}/edit', [ThesisDocumentController::class, 'edit'])->name('thesis.edit');
+    Route::put('/thesis/{document}', [ThesisDocumentController::class, 'update'])->name('thesis.update');
+    Route::delete('/thesis/{document}/files/{fileIndex}', [ThesisDocumentController::class, 'removeFile'])->name('thesis.remove-file');
     Route::get('/thesis/{document}/download/{fileIndex}', [ThesisDocumentController::class, 'downloadFile'])->name('thesis.download');
+    Route::post('/thesis/panel-assignment/{panelAssignment}/mark-completed', [ThesisDocumentController::class, 'markDefenseCompleted'])->name('thesis.mark-defense-completed');
 });
 
 // Faculty Thesis Review Routes
@@ -191,6 +359,12 @@ Route::middleware(['auth', 'verified'])->prefix('faculty')->name('faculty.')->gr
     Route::get('/thesis/progress', [App\Http\Controllers\Faculty\ThesisReviewController::class, 'progress'])->name('thesis.progress');
     Route::get('/thesis/reviews/{document}', [App\Http\Controllers\Faculty\ThesisReviewController::class, 'show'])->name('thesis.show');
     Route::put('/thesis/reviews/{document}', [App\Http\Controllers\Faculty\ThesisReviewController::class, 'updateReview'])->name('thesis.update');
+    Route::get('/thesis/{document}/download/{fileIndex}', [App\Http\Controllers\Faculty\ThesisReviewController::class, 'downloadFile'])->name('thesis.download');
+    
+    // Panel Assignment Review Routes
+    Route::get('/panel-assignments', [App\Http\Controllers\Faculty\PanelAssignmentReviewController::class, 'index'])->name('panel-assignments.index');
+    Route::get('/panel-assignments/{panelAssignment}', [App\Http\Controllers\Faculty\PanelAssignmentReviewController::class, 'show'])->name('panel-assignments.show');
+    Route::post('/panel-assignments/{panelAssignment}/review', [App\Http\Controllers\Faculty\PanelAssignmentReviewController::class, 'submitReview'])->name('panel-assignments.review');
 });
 
 // Admin Routes
@@ -215,6 +389,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/records/export/forms', [App\Http\Controllers\Admin\RecordsController::class, 'exportForms'])->name('records.export-forms');
     Route::get('/records/export/documents', [App\Http\Controllers\Admin\RecordsController::class, 'exportDocuments'])->name('records.export-documents');
     Route::get('/records/feedback/{type}/{id}', [App\Http\Controllers\Admin\RecordsController::class, 'feedbackLogs'])->name('records.feedback');
+    
+    // Defense Confirmation Routes
+    Route::post('/records/documents/{document}/confirm-defense', [App\Http\Controllers\Admin\RecordsController::class, 'confirmDefense'])->name('records.confirm-defense');
+    Route::post('/records/documents/{document}/mark-defended', [App\Http\Controllers\Admin\RecordsController::class, 'markProposalDefended'])->name('records.mark-defended');
 
     // Reports
     Route::get('/reports', [App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('reports');

@@ -239,6 +239,27 @@
                                                         <p class="text-gray-600 dark:text-gray-400 font-medium">Document Type</p>
                                                         <p class="text-gray-900 dark:text-white font-semibold">{{ ucfirst(str_replace('_', ' ', $document->document_type)) }}</p>
                                                         <p class="text-gray-500 dark:text-gray-500">{{ $document->submission_date->format('M j, Y') }}</p>
+                                                        @if($document->document_type === 'panel_assignment')
+                                                            @php
+                                                                $panelAssignment = $document->panelAssignments()->where(function ($q) {
+                                                                    $q->where('panel_chair_id', auth()->id())
+                                                                      ->orWhere('secretary_id', auth()->id())
+                                                                      ->orWhereJsonContains('panel_members', auth()->id());
+                                                                })->first();
+                                                            @endphp
+                                                            @if($panelAssignment)
+                                                                <div class="mt-2">
+                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+                                                                        {{ $panelAssignment->defense_type }}
+                                                                    </span>
+                                                                    @if($panelAssignment->defense_date)
+                                                                        <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                                                            Defense: {{ $panelAssignment->defense_date->format('M j, Y') }}
+                                                                        </p>
+                                                                    @endif
+                                                                </div>
+                                                            @endif
+                                                        @endif
                                                     </div>
                                                     <div>
                                                         <p class="text-gray-600 dark:text-gray-400 font-medium">Status</p>
@@ -259,14 +280,42 @@
 
                                         <!-- Action Buttons -->
                                         <div class="flex flex-col space-y-2 ml-4 flex-shrink-0">
-                                            <a href="{{ route('faculty.thesis.show', $document) }}" 
-                                               class="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-gray-900 dark:text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow-md">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                </svg>
-                                                Review
-                                            </a>
+                                            @if($document->document_type === 'panel_assignment')
+                                                @php
+                                                    $panelAssignment = $document->panelAssignments()->where(function ($q) {
+                                                        $q->where('panel_chair_id', auth()->id())
+                                                          ->orWhere('secretary_id', auth()->id())
+                                                          ->orWhereJsonContains('panel_members', auth()->id());
+                                                    })->first();
+                                                @endphp
+                                                @if($panelAssignment)
+                                                    <a href="{{ route('faculty.panel-assignments.show', $panelAssignment) }}" 
+                                                       class="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-gray-900 dark:text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow-md">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                        </svg>
+                                                        Panel Review
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('faculty.thesis.show', $document) }}" 
+                                                       class="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-gray-900 dark:text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow-md">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                        </svg>
+                                                        Review
+                                                    </a>
+                                                @endif
+                                            @else
+                                                <a href="{{ route('faculty.thesis.show', $document) }}" 
+                                                   class="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-gray-900 dark:text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow-md">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    Review
+                                                </a>
+                                            @endif
                                             @if($document->status === 'pending')
                                                 <span class="px-4 py-2 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-lg font-semibold text-sm text-center border border-yellow-200 dark:border-yellow-700">
                                                     Awaiting Review

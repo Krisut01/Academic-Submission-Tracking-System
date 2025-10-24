@@ -76,6 +76,10 @@
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Defense Details</h3>
                             <div class="space-y-3">
                                 <div>
+                                    <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Defense Type</label>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $assignment->defense_type_label }}</p>
+                                </div>
+                                <div>
                                     <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Defense Date</label>
                                     <p class="text-sm text-gray-900 dark:text-white">{{ $assignment->defense_date->format('F j, Y') }}</p>
                                 </div>

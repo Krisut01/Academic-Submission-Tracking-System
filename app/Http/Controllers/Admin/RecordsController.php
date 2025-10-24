@@ -243,7 +243,7 @@ class RecordsController extends Controller
                     ucfirst($form->form_type),
                     $form->title,
                     ucfirst($form->status),
-                    $form->submission_date->format('Y-m-d'),
+                    $form->submission_date ? $form->submission_date->format('Y-m-d') : 'N/A',
                     $form->reviewer ? $form->reviewer->name : 'N/A',
                     $form->reviewed_at ? $form->reviewed_at->format('Y-m-d H:i:s') : 'N/A',
                 ]);
@@ -306,7 +306,7 @@ class RecordsController extends Controller
                     ucfirst(str_replace('_', ' ', $document->document_type)),
                     $document->title,
                     ucfirst(str_replace('_', ' ', $document->status)),
-                    $document->submission_date->format('Y-m-d'),
+                    $document->submission_date ? $document->submission_date->format('Y-m-d') : 'N/A',
                     $document->reviewer ? $document->reviewer->name : 'N/A',
                     $document->reviewed_at ? $document->reviewed_at->format('Y-m-d H:i:s') : 'N/A',
                 ]);
@@ -330,6 +330,160 @@ class RecordsController extends Controller
         }
 
         return view('admin.records.feedback-logs', compact('record', 'type'));
+    }
+
+    /**
+     * Confirm defense completion for a thesis document
+     */
+    public function confirmDefense(Request $request, ThesisDocument $document)
+    {
+        $this->ensureUserIsAdmin();
+
+        $request->validate([
+            'defense_status' => 'required|in:completed,failed,postponed',
+            'defense_notes' => 'nullable|string|max:1000',
+            'defense_date' => 'nullable|date',
+            'defense_grade' => 'nullable|numeric|min:0|max:100'
+        ]);
+
+        try {
+            // Update document with defense information
+            $document->update([
+                'defense_status' => $request->defense_status,
+                'defense_notes' => $request->defense_notes,
+                'defense_date' => $request->defense_date ? \Carbon\Carbon::parse($request->defense_date) : now(),
+                'defense_grade' => $request->defense_grade,
+                'defense_confirmed_by' => Auth::id(),
+                'defense_confirmed_at' => now(),
+                'status' => $request->defense_status === 'completed' ? 'approved' : 'returned'
+            ]);
+
+            // Log the activity
+            \App\Models\ActivityLog::logActivity(
+                'defense_confirmed',
+                'defense_confirmed',
+                $document,
+                null, // old values
+                [
+                    'document_id' => $document->id,
+                    'defense_status' => $request->defense_status,
+                    'defense_grade' => $request->defense_grade,
+                    'defense_notes' => $request->defense_notes
+                ], // new values
+                [
+                    'defense_confirmed_by' => Auth::id(),
+                    'defense_confirmed_at' => now()
+                ], // metadata
+                'Defense confirmed by admin',
+                Auth::id()
+            );
+
+            // Send notification to student
+            \App\Models\Notification::createForUser(
+                $document->user_id,
+                'defense_result',
+                'Defense Result Available',
+                "Your {$document->document_type_label} defense has been {$request->defense_status}. " . 
+                ($request->defense_notes ? "Notes: {$request->defense_notes}" : ""),
+                [
+                    'document_id' => $document->id,
+                    'defense_status' => $request->defense_status,
+                    'defense_grade' => $request->defense_grade,
+                    'defense_notes' => $request->defense_notes,
+                    'url' => route('student.thesis.show', $document->id)
+                ],
+                'ThesisDocument',
+                $document->id,
+                'high'
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Defense status updated successfully',
+                'defense_status' => $request->defense_status,
+                'defense_grade' => $request->defense_grade
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update defense status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Mark proposal as defended
+     */
+    public function markProposalDefended(Request $request, ThesisDocument $document)
+    {
+        $this->ensureUserIsAdmin();
+
+        $request->validate([
+            'defense_notes' => 'nullable|string|max:1000',
+            'defense_grade' => 'nullable|numeric|min:0|max:100'
+        ]);
+
+        try {
+            // Update document with defense completion
+            $document->update([
+                'defense_status' => 'completed',
+                'defense_notes' => $request->defense_notes,
+                'defense_grade' => $request->defense_grade,
+                'defense_confirmed_by' => Auth::id(),
+                'defense_confirmed_at' => now(),
+                'status' => 'approved'
+            ]);
+
+            // Log the activity
+            \App\Models\ActivityLog::logActivity(
+                'proposal_defended',
+                'defense_confirmed',
+                $document,
+                null, // old values
+                [
+                    'document_id' => $document->id,
+                    'defense_grade' => $request->defense_grade,
+                    'defense_notes' => $request->defense_notes,
+                    'defense_status' => $request->defense_status
+                ], // new values
+                [
+                    'defense_confirmed_by' => Auth::id(),
+                    'defense_confirmed_at' => now()
+                ], // metadata
+                'Defense confirmed by admin',
+                Auth::id()
+            );
+
+            // Send notification to student
+            \App\Models\Notification::createForUser(
+                $document->user_id,
+                'proposal_defended',
+                'Proposal Defense Completed',
+                "Your proposal defense has been completed successfully. " . 
+                ($request->defense_notes ? "Notes: {$request->defense_notes}" : ""),
+                [
+                    'document_id' => $document->id,
+                    'defense_grade' => $request->defense_grade,
+                    'defense_notes' => $request->defense_notes,
+                    'url' => route('student.thesis.show', $document->id)
+                ],
+                'ThesisDocument',
+                $document->id,
+                'high'
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Proposal marked as defended successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark proposal as defended: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

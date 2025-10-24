@@ -61,6 +61,7 @@ class PanelAssignmentController extends Controller
             'total_assignments' => PanelAssignment::count(),
             'scheduled_defenses' => PanelAssignment::where('status', 'scheduled')->count(),
             'completed_defenses' => PanelAssignment::where('status', 'completed')->count(),
+            'defended_defenses' => PanelAssignment::where('status', 'completed')->whereNotNull('completed_at')->count(),
             'upcoming_defenses' => PanelAssignment::upcoming()->count(),
             'overdue_defenses' => PanelAssignment::overdue()->count(),
         ];
@@ -74,7 +75,15 @@ class PanelAssignmentController extends Controller
             ->whereDoesntHave('panelAssignments')
             ->get();
 
-        return view('admin.panel.index', compact('assignments', 'stats', 'studentsReadyForDefense'));
+        // Get student panel assignment requests (pre-assignments)
+        $studentPanelRequests = ThesisDocument::with(['user'])
+            ->where('document_type', 'panel_assignment')
+            ->where('status', 'approved')
+            ->orderBy('submission_date', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('admin.panel.index', compact('assignments', 'stats', 'studentsReadyForDefense', 'studentPanelRequests'));
     }
 
     /**
@@ -86,9 +95,39 @@ class PanelAssignmentController extends Controller
 
         $student = null;
         $thesisDocument = null;
+        $studentRequest = null;
+        $preferredPanelMembers = [];
 
-        // If student_id and thesis_id are provided, pre-fill the form
-        if ($request->filled('student_id') && $request->filled('thesis_id')) {
+        // If creating from a student panel assignment request
+        if ($request->filled('from_request')) {
+            $studentRequest = ThesisDocument::where('id', $request->from_request)
+                ->where('document_type', 'panel_assignment')
+                ->where('status', 'approved')
+                ->with('user')
+                ->firstOrFail();
+            
+            $student = $studentRequest->user;
+            
+            // Find the student's approved final manuscript for the panel assignment
+            $thesisDocument = ThesisDocument::where('user_id', $student->id)
+                ->where('status', 'approved')
+                ->where('document_type', 'final_manuscript')
+                ->first();
+                
+            // If no approved final manuscript, get any approved thesis document
+            if (!$thesisDocument) {
+                $thesisDocument = ThesisDocument::where('user_id', $student->id)
+                    ->where('status', 'approved')
+                    ->first();
+            }
+            
+            // Extract preferred panel members from the student's request
+            if ($studentRequest->panel_members && is_array($studentRequest->panel_members)) {
+                $preferredPanelMembers = $studentRequest->panel_members;
+            }
+        }
+        // If student_id and thesis_id are provided, pre-fill the form (existing functionality)
+        elseif ($request->filled('student_id') && $request->filled('thesis_id')) {
             $student = User::findOrFail($request->student_id);
             $thesisDocument = ThesisDocument::findOrFail($request->thesis_id);
         }
@@ -96,6 +135,10 @@ class PanelAssignmentController extends Controller
         // Get all faculty members for panel selection
         $facultyMembers = User::where('role', 'faculty')->orderBy('name')->get();
 
+        // Debug: Check what thesis documents exist
+        $allStudents = User::where('role', 'student')->get();
+        $allThesisDocuments = ThesisDocument::all(['document_type', 'status', 'user_id', 'title']);
+        
         // Get students with approved final manuscripts
         $eligibleStudents = User::where('role', 'student')
             ->whereHas('thesisDocuments', function ($q) {
@@ -104,8 +147,26 @@ class PanelAssignmentController extends Controller
             })
             ->orderBy('name')
             ->get();
+            
+        // Temporary: Also get students with ANY approved thesis documents for testing
+        $studentsWithApprovedThesis = User::where('role', 'student')
+            ->whereHas('thesisDocuments', function ($q) {
+                $q->where('status', 'approved');
+            })
+            ->orderBy('name')
+            ->get();
+            
+        // If no eligible students, use students with any approved thesis
+        if ($eligibleStudents->isEmpty() && !$studentsWithApprovedThesis->isEmpty()) {
+            $eligibleStudents = $studentsWithApprovedThesis;
+        }
+        
+        // If still empty, use all students for debugging
+        if ($eligibleStudents->isEmpty()) {
+            $eligibleStudents = $allStudents;
+        }
 
-        return view('admin.panel.create', compact('student', 'thesisDocument', 'facultyMembers', 'eligibleStudents'));
+        return view('admin.panel.create', compact('student', 'thesisDocument', 'facultyMembers', 'eligibleStudents', 'studentRequest', 'preferredPanelMembers'));
     }
 
     /**
@@ -114,6 +175,13 @@ class PanelAssignmentController extends Controller
     public function store(Request $request)
     {
         $this->ensureUserIsAdmin();
+
+        // Check for duplicate submission
+        if (!$request->has('form_submitted')) {
+            return redirect()->back()
+                ->withErrors(['form' => 'Invalid form submission. Please try again.'])
+                ->withInput();
+        }
 
         $request->validate([
             'student_id' => 'required|exists:users,id',
@@ -127,7 +195,20 @@ class PanelAssignmentController extends Controller
             'defense_date' => 'required|date|after:now',
             'defense_venue' => 'required|string|max:255',
             'defense_instructions' => 'nullable|string',
+            'defense_type' => 'required|in:proposal_defense,final_defense,redefense,oral_defense,thesis_defense',
         ]);
+
+        // Check if panel assignment already exists for this student and thesis
+        $existingAssignment = PanelAssignment::where('student_id', $request->student_id)
+            ->where('thesis_document_id', $request->thesis_document_id)
+            ->where('defense_type', $request->defense_type)
+            ->first();
+
+        if ($existingAssignment) {
+            return redirect()->back()
+                ->withErrors(['duplicate' => 'A panel assignment already exists for this student and thesis document.'])
+                ->withInput();
+        }
 
         // Validate that panel chair is in panel members
         if (!in_array($request->panel_chair_id, $request->panel_members)) {
@@ -148,9 +229,23 @@ class PanelAssignmentController extends Controller
             'defense_date' => $request->defense_date,
             'defense_venue' => $request->defense_venue,
             'defense_instructions' => $request->defense_instructions,
+            'defense_type' => $request->defense_type,
             'status' => 'scheduled',
             'created_by' => Auth::id(),
         ]);
+
+        // If this panel assignment was created from a student request, update the request status
+        if ($request->filled('from_request_id')) {
+            $studentRequest = ThesisDocument::find($request->from_request_id);
+            if ($studentRequest && $studentRequest->document_type === 'panel_assignment') {
+                // Add a note to the student request that panel has been created
+                $studentRequest->update([
+                    'review_comments' => ($studentRequest->review_comments ?? '') . 
+                        "\n\n[PANEL CREATED] Official panel assignment created on " . now()->format('F j, Y g:i A') . 
+                        " by " . Auth::user()->name . ". Panel ID: " . $assignment->id
+                ]);
+            }
+        }
 
         // Send notifications
         $assignment->sendNotifications();
@@ -199,10 +294,8 @@ class PanelAssignmentController extends Controller
             'defense_date' => 'required|date',
             'defense_venue' => 'required|string|max:255',
             'defense_instructions' => 'nullable|string',
-            'status' => ['required', Rule::in(['scheduled', 'completed', 'postponed', 'cancelled'])],
-            'result' => ['nullable', Rule::in(['passed', 'failed', 'conditional', 'pending'])],
-            'panel_feedback' => 'nullable|string',
-            'final_grade' => 'nullable|numeric|min:0|max:100',
+            'defense_type' => 'required|in:proposal_defense,final_defense,redefense,oral_defense,thesis_defense',
+            'status' => ['required', Rule::in(['scheduled', 'postponed', 'cancelled'])], // Removed 'completed' - faculty handles completion
         ]);
 
         // Validate that panel chair is in panel members
@@ -212,15 +305,7 @@ class PanelAssignmentController extends Controller
                 ->withInput();
         }
 
-        // Additional validation for completed status
-        if ($request->status === 'completed') {
-            if (empty($request->result)) {
-                return redirect()->back()
-                    ->withErrors(['result' => 'Result is required when status is completed.'])
-                    ->withInput();
-            }
-        }
-
+        // Admin only handles scheduling, not grading/completion
         $assignment->update([
             'panel_members' => $request->panel_members,
             'panel_chair_id' => $request->panel_chair_id,
@@ -228,10 +313,8 @@ class PanelAssignmentController extends Controller
             'defense_date' => $request->defense_date,
             'defense_venue' => $request->defense_venue,
             'defense_instructions' => $request->defense_instructions,
+            'defense_type' => $request->defense_type,
             'status' => $request->status,
-            'result' => $request->result,
-            'panel_feedback' => $request->panel_feedback,
-            'final_grade' => $request->final_grade,
             'updated_by' => Auth::id(),
         ]);
 
@@ -326,11 +409,27 @@ class PanelAssignmentController extends Controller
     {
         $this->ensureUserIsAdmin();
 
+        // First try to get approved final manuscripts
         $thesisDocuments = ThesisDocument::where('user_id', $studentId)
             ->where('status', 'approved')
             ->where('document_type', 'final_manuscript')
-            ->select(['id', 'title', 'document_type'])
+            ->select(['id', 'title', 'document_type', 'status'])
             ->get();
+            
+        // If no approved final manuscripts, get any approved thesis documents
+        if ($thesisDocuments->isEmpty()) {
+            $thesisDocuments = ThesisDocument::where('user_id', $studentId)
+                ->where('status', 'approved')
+                ->select(['id', 'title', 'document_type', 'status'])
+                ->get();
+        }
+        
+        // If still empty, get all thesis documents for debugging
+        if ($thesisDocuments->isEmpty()) {
+            $thesisDocuments = ThesisDocument::where('user_id', $studentId)
+                ->select(['id', 'title', 'document_type', 'status'])
+                ->get();
+        }
 
         return response()->json($thesisDocuments);
     }
@@ -397,23 +496,34 @@ class PanelAssignmentController extends Controller
                 'high'
             );
 
-            // Send notification to panel members
-            if (!empty($assignment->panel_member_ids)) {
+            // Send notification to all panel members (including chair and secretary)
+            $allPanelMembers = array_merge(
+                $assignment->panel_member_ids ?? [],
+                [$assignment->panel_chair_id, $assignment->secretary_id]
+            );
+            $allPanelMembers = array_filter(array_unique($allPanelMembers));
+
+            if (!empty($allPanelMembers)) {
+                $defenseDateInfo = $assignment->defense_date ? " Defense scheduled for {$assignment->defense_date->format('F j, Y \a\t g:i A')} at {$assignment->defense_venue}." : "";
+                
                 $panelNotification = [
                     'title' => 'Panel Assignment Updated',
-                    'message' => "The panel assignment for {$assignment->student->name}'s thesis defense has been updated.",
+                    'message' => "The panel assignment for {$assignment->student->name}'s {$assignment->defense_type_label} has been updated.{$defenseDateInfo}",
                     'data' => [
                         'panel_assignment_id' => $assignment->id,
                         'student_name' => $assignment->student->name,
+                        'thesis_title' => $assignment->thesis_title,
                         'defense_date' => $assignment->defense_date,
                         'venue' => $assignment->defense_venue,
+                        'defense_type' => $assignment->defense_type,
+                        'defense_type_label' => $assignment->defense_type_label,
                         'status' => $assignment->status,
-                        'url' => route('faculty.thesis.reviews'),
+                        'url' => route('faculty.panel-assignments.show', $assignment),
                     ]
                 ];
 
                 \App\Models\Notification::createForUsers(
-                    $assignment->panel_member_ids,
+                    $allPanelMembers,
                     'panel_assignment_updated',
                     $panelNotification['title'],
                     $panelNotification['message'],

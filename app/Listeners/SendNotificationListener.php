@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\FormSubmitted;
+use App\Events\ThesisSubmitted;
 use App\Events\ThesisStatusUpdated;
 use App\Events\UserRoleChanged;
 use App\Models\Notification;
@@ -44,6 +45,34 @@ class SendNotificationListener
             ],
             get_class($event->form),
             $event->form->id,
+            'normal'
+        );
+    }
+
+    /**
+     * Handle thesis submitted events
+     */
+    public function handleThesisSubmitted(ThesisSubmitted $event): void
+    {
+        // Notify faculty and admin about new thesis submission
+        $facultyAndAdmins = User::whereIn('role', ['faculty', 'admin'])->pluck('id')->toArray();
+        
+        $title = 'New Thesis Document Submitted';
+        $message = "Student {$event->document->user->name} submitted a new {$event->document->document_type}: {$event->document->title}";
+        
+        Notification::createForUsers(
+            $facultyAndAdmins,
+            'thesis_submitted',
+            $title,
+            $message,
+            [
+                'document_id' => $event->document->id,
+                'student_name' => $event->document->user->name,
+                'document_type' => $event->document->document_type,
+                'url' => route('admin.records.show-document', $event->document)
+            ],
+            get_class($event->document),
+            $event->document->id,
             'normal'
         );
     }

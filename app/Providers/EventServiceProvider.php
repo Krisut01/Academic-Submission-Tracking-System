@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\FormSubmitted;
+use App\Events\ThesisSubmitted;
 use App\Events\ThesisStatusUpdated;
 use App\Events\UserRoleChanged;
 use App\Listeners\LogActivityListener;
@@ -28,6 +29,12 @@ class EventServiceProvider extends ServiceProvider
         FormSubmitted::class => [
             LogActivityListener::class . '@handleFormSubmitted',
             SendNotificationListener::class . '@handleFormSubmitted',
+        ],
+        
+        // Thesis submission events
+        ThesisSubmitted::class => [
+            LogActivityListener::class . '@handleThesisSubmitted',
+            SendNotificationListener::class . '@handleThesisSubmitted',
         ],
         
         // Thesis status update events

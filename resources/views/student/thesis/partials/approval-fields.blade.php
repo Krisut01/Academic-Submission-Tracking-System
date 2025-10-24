@@ -22,9 +22,21 @@
                     <!-- Panel Chair -->
                     <div>
                         <label for="panel_chair" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Panel Chair</label>
-                        <input type="text" name="panel_chair" id="panel_chair" value="{{ old('panel_chair') }}" required
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="Enter panel chair name">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <select name="panel_chair_id" id="panel_chair_id"
+                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                <option value="">Select from Faculty List</option>
+                                @foreach(\App\Models\User::where('role', 'faculty')->orderBy('name')->get() as $faculty)
+                                    <option value="{{ $faculty->id }}" {{ old('panel_chair_id') == $faculty->id ? 'selected' : '' }}>
+                                        {{ $faculty->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <input type="text" name="panel_chair" id="panel_chair" value="{{ old('panel_chair') }}"
+                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                   placeholder="Or enter name manually">
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Select from the dropdown or enter manually if not listed</p>
                         @error('panel_chair')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -33,9 +45,21 @@
                     <!-- Panel Member 1 -->
                     <div>
                         <label for="panel_member_1" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Panel Member 1</label>
-                        <input type="text" name="panel_member_1" id="panel_member_1" value="{{ old('panel_member_1') }}" required
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="Enter panel member name">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <select name="panel_member_1_id" id="panel_member_1_id"
+                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                <option value="">Select from Faculty List</option>
+                                @foreach(\App\Models\User::where('role', 'faculty')->orderBy('name')->get() as $faculty)
+                                    <option value="{{ $faculty->id }}" {{ old('panel_member_1_id') == $faculty->id ? 'selected' : '' }}>
+                                        {{ $faculty->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <input type="text" name="panel_member_1" id="panel_member_1" value="{{ old('panel_member_1') }}"
+                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                   placeholder="Or enter name manually">
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Select from the dropdown or enter manually if not listed</p>
                         @error('panel_member_1')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -44,9 +68,21 @@
                     <!-- Panel Member 2 -->
                     <div>
                         <label for="panel_member_2" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Panel Member 2</label>
-                        <input type="text" name="panel_member_2" id="panel_member_2" value="{{ old('panel_member_2') }}" required
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="Enter panel member name">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <select name="panel_member_2_id" id="panel_member_2_id"
+                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                <option value="">Select from Faculty List</option>
+                                @foreach(\App\Models\User::where('role', 'faculty')->orderBy('name')->get() as $faculty)
+                                    <option value="{{ $faculty->id }}" {{ old('panel_member_2_id') == $faculty->id ? 'selected' : '' }}>
+                                        {{ $faculty->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <input type="text" name="panel_member_2" id="panel_member_2" value="{{ old('panel_member_2') }}"
+                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                   placeholder="Or enter name manually">
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Select from the dropdown or enter manually if not listed</p>
                         @error('panel_member_2')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -255,9 +291,19 @@ document.addEventListener('DOMContentLoaded', function() {
         newMemberDiv.innerHTML = `
             <div class="flex-1">
                 <label for="panel_member_${panelMemberCount}" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Panel Member ${panelMemberCount}</label>
-                <input type="text" name="panel_member_${panelMemberCount}" id="panel_member_${panelMemberCount}"
-                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                       placeholder="Enter panel member name">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <select name="panel_member_${panelMemberCount}_id" id="panel_member_${panelMemberCount}_id"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <option value="">Select from Faculty List</option>
+                        @foreach(\App\Models\User::where('role', 'faculty')->orderBy('name')->get() as $faculty)
+                            <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="text" name="panel_member_${panelMemberCount}" id="panel_member_${panelMemberCount}"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                           placeholder="Or enter name manually">
+                </div>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Select from the dropdown or enter manually if not listed</p>
             </div>
             <button type="button" class="remove-panel-member mt-6 p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,6 +319,47 @@ document.addEventListener('DOMContentLoaded', function() {
         newMemberDiv.querySelector('.remove-panel-member').addEventListener('click', function() {
             newMemberDiv.remove();
         });
+        
+        // Add sync functionality for the new dropdown
+        const newSelect = newMemberDiv.querySelector(`select[name="panel_member_${panelMemberCount-1}_id"]`);
+        const newInput = newMemberDiv.querySelector(`input[name="panel_member_${panelMemberCount-1}"]`);
+        
+        newSelect.addEventListener('change', function() {
+            if (this.value) {
+                newInput.value = this.options[this.selectedIndex].text;
+            }
+        });
+        
+        newInput.addEventListener('input', function() {
+            if (this.value) {
+                newSelect.value = '';
+            }
+        });
     });
+    
+    // Add sync functionality for existing dropdowns
+    function setupDropdownSync(selectId, inputId) {
+        const select = document.getElementById(selectId);
+        const input = document.getElementById(inputId);
+        
+        if (select && input) {
+            select.addEventListener('change', function() {
+                if (this.value) {
+                    input.value = this.options[this.selectedIndex].text;
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value) {
+                    select.value = '';
+                }
+            });
+        }
+    }
+    
+    // Setup sync for existing panel member fields
+    setupDropdownSync('panel_chair_id', 'panel_chair');
+    setupDropdownSync('panel_member_1_id', 'panel_member_1');
+    setupDropdownSync('panel_member_2_id', 'panel_member_2');
 });
 </script> 

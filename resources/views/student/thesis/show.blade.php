@@ -202,26 +202,37 @@
 
             <!-- Review Feedback -->
             @if($document->review_comments)
-                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">
                     <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Review Feedback</h3>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Review Feedback</h3>
+                            @if($document->status === 'returned_for_revision')
+                                <a href="{{ route('student.thesis.edit', $document) }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors duration-200">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Edit Document
+                                </a>
+                            @endif
+                        </div>
                     </div>
                     <div class="px-6 py-5">
                         <div class="space-y-4">
-                            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                            <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
                                 <div class="flex items-start justify-between mb-3">
                                     <div>
-                                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                                        <h4 class="text-sm font-medium text-red-800 dark:text-red-300">
                                             {{ $document->reviewer ? $document->reviewer->name : 'Reviewer' }}
                                         </h4>
                                         @if($document->reviewed_at)
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            <p class="text-xs text-red-600 dark:text-red-400">
                                                 {{ $document->reviewed_at->format('F j, Y g:i A') }}
                                             </p>
                                         @endif
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-700 dark:text-gray-300">{{ $document->review_comments }}</p>
+                                <p class="text-sm text-red-700 dark:text-red-300">{{ $document->review_comments }}</p>
                             </div>
                         </div>
                     </div>

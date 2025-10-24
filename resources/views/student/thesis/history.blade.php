@@ -253,6 +253,12 @@
                                                    class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors duration-200">
                                                     View Details
                                                 </a>
+                                                @if($document->status === 'returned_for_revision')
+                                                    <a href="{{ route('student.thesis.edit', $document) }}" 
+                                                       class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-emerald-200 dark:hover:bg-emerald-800/50 transition-colors duration-200">
+                                                        Edit Document
+                                                    </a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

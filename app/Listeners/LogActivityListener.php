@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\FormSubmitted;
+use App\Events\ThesisSubmitted;
 use App\Events\ThesisStatusUpdated;
 use App\Events\UserRoleChanged;
 use App\Models\ActivityLog;
@@ -33,6 +34,23 @@ class LogActivityListener
             $event->metadata,
             null,
             $event->form->user_id
+        );
+    }
+
+    /**
+     * Handle thesis submitted events
+     */
+    public function handleThesisSubmitted(ThesisSubmitted $event): void
+    {
+        ActivityLog::logActivity(
+            'thesis_submitted',
+            'created',
+            $event->document,
+            null,
+            $event->document->toArray(),
+            $event->metadata,
+            null,
+            $event->document->user_id
         );
     }
 

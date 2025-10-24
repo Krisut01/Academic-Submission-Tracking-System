@@ -681,6 +681,25 @@
             @else
                 <!-- Enhanced Student Dashboard -->
                 <div class="space-y-8">
+                    <!-- Dashboard Header with Refresh Button -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Student Dashboard</h1>
+                            <p class="text-gray-600 dark:text-gray-400">Track your academic progress and submissions</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                <span>Auto-refresh</span>
+                            </div>
+                            <button data-refresh="dashboard" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
                     <!-- Quick Stats Overview with improved contrast -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <!-- Forms Submitted -->
@@ -775,38 +794,221 @@
 
                                 <!-- Content with Proper Spacing -->
                                 <div class="p-8">
-                                    <!-- Current Thesis Status -->
-                                    @if(isset($dashboardData['current_thesis_progress']))
-                                        @php $currentThesis = $dashboardData['current_thesis_progress']; @endphp
-                                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-8 border border-blue-200 dark:border-blue-700">
-                                            <div class="flex items-start gap-4">
-                                                <div class="p-3 bg-blue-600 rounded-lg flex-shrink-0">
-                                                    <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                    </svg>
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ $currentThesis->title }}</h3>
-                                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                                                        {{ ucfirst(str_replace('_', ' ', $currentThesis->document_type)) }}
-                                                        @if($currentThesis->reviewed_by && $currentThesis->reviewer)
-                                                            - Under review by {{ $currentThesis->reviewer->name }}
+                                    <!-- Defense Schedule Notification Popup -->
+                                    @if(isset($dashboardData['defense_notification']) && $dashboardData['defense_notification'])
+                                        <div id="defenseNotification" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-6 mb-6 shadow-lg">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex items-start space-x-4">
+                                                    <div class="p-3 bg-blue-600 rounded-lg flex-shrink-0">
+                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-6 6v6a1 1 0 001 1h4a1 1 0 001-1v-6M8 13h8"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <div class="flex items-center space-x-2 mb-2">
+                                                            <h3 class="text-lg font-bold text-blue-900 dark:text-blue-100">{{ $dashboardData['defense_notification']['title'] }}</h3>
+                                                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
+                                                                {{ $dashboardData['defense_notification']['defense_type'] }}
+                                                            </span>
+                                                            @if(isset($dashboardData['defense_notification']['is_upcoming']) && $dashboardData['defense_notification']['is_upcoming'])
+                                                                <span class="px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                                                                    {{ $dashboardData['defense_notification']['days_until'] }} days away
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        <p class="text-blue-800 dark:text-blue-200 font-medium mb-3">{{ $dashboardData['defense_notification']['message'] }}</p>
+                                                        
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                                            <div class="flex items-center space-x-2">
+                                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-6 6v6a1 1 0 001 1h4a1 1 0 001-1v-6M8 13h8"></path>
+                                                                </svg>
+                                                                <span class="text-blue-700 dark:text-blue-300">
+                                                                    <strong>Date:</strong> {{ $dashboardData['defense_notification']['defense_date']->format('F j, Y \a\t g:i A') }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex items-center space-x-2">
+                                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                </svg>
+                                                                <span class="text-blue-700 dark:text-blue-300">
+                                                                    <strong>Venue:</strong> {{ $dashboardData['defense_notification']['venue'] }}
+                                                                </span>
+                                                            </div>
+                                                            @if($dashboardData['defense_notification']['panel_chair'])
+                                                            <div class="flex items-center space-x-2">
+                                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                                                </svg>
+                                                                <span class="text-blue-700 dark:text-blue-300">
+                                                                    <strong>Panel Chair:</strong> {{ $dashboardData['defense_notification']['panel_chair'] }}
+                                                                </span>
+                                                            </div>
+                                                            @endif
+                                                            @if($dashboardData['defense_notification']['secretary'])
+                                                            <div class="flex items-center space-x-2">
+                                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                                </svg>
+                                                                <span class="text-blue-700 dark:text-blue-300">
+                                                                    <strong>Secretary:</strong> {{ $dashboardData['defense_notification']['secretary'] }}
+                                                                </span>
+                                                            </div>
+                                                            @endif
+                                                        </div>
+                                                        
+                                                        @if($dashboardData['defense_notification']['instructions'])
+                                                        <div class="mt-4 p-3 bg-blue-100 dark:bg-blue-800/30 rounded-lg">
+                                                            <p class="text-sm text-blue-800 dark:text-blue-200">
+                                                                <strong>Instructions:</strong> {{ $dashboardData['defense_notification']['instructions'] }}
+                                                            </p>
+                                                        </div>
                                                         @endif
-                                                    </p>
-                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200">
-                                                        {{ ucfirst(str_replace('_', ' ', $currentThesis->status)) }}
-                                                    </span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-col space-y-2 ml-4">
+                                                    <button onclick="viewDefenseDetails({{ $dashboardData['defense_notification']['assignment_id'] }})" 
+                                                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                        </svg>
+                                                        View Details
+                                                    </button>
+                                                    <button onclick="dismissDefenseNotification()" 
+                                                            class="inline-flex items-center px-3 py-1 bg-gray-500 hover:bg-gray-600 text-white text-xs font-medium rounded transition-colors duration-200">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                        </svg>
+                                                        Dismiss
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    @else
-                                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-8 mb-8 text-center">
-                                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Active Thesis</h3>
-                                            <p class="text-gray-600 dark:text-gray-400 mb-4">Start by submitting your thesis proposal</p>
-                                            <a href="{{ route('student.thesis.index') }}" class="inline-flex items-center px-6 py-3 btn-primary font-semibold rounded-lg transition duration-200 shadow-sm btn-text-gray-900 dark:text-white">
-                                                Submit Thesis Document
-                                            </a>
+                                    @endif
+                                    
+                                    <!-- Real-time Research Progress Tracking -->
+                                    @if(isset($dashboardData['research_progress']))
+                                        @php $researchProgress = $dashboardData['research_progress']; @endphp
+                                        
+                                        <!-- Progress Overview -->
+                                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 mb-6 border border-blue-200 dark:border-blue-700">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div>
+                                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Research Progress</h3>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Current Phase: {{ $researchProgress['current_phase'] }}</p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $researchProgress['progress_percentage'] }}%</div>
+                                                    <div class="text-sm text-gray-600 dark:text-gray-400">Complete</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Progress Bar -->
+                                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4">
+                                                <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-500" 
+                                                     style="width: {{ $researchProgress['progress_percentage'] }}%"></div>
+                                            </div>
+                                            
+                                            <!-- Milestones Status -->
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="w-3 h-3 rounded-full {{ $researchProgress['milestones']['proposal_submitted'] ? 'bg-green-500' : 'bg-gray-300' }}"></div>
+                                                    <span class="text-gray-700 dark:text-gray-300">Proposal</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="w-3 h-3 rounded-full {{ $researchProgress['milestones']['approval_sheet_submitted'] ? 'bg-green-500' : 'bg-gray-300' }}"></div>
+                                                    <span class="text-gray-700 dark:text-gray-300">Approval</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="w-3 h-3 rounded-full {{ $researchProgress['milestones']['defense_scheduled'] ? 'bg-green-500' : 'bg-gray-300' }}"></div>
+                                                    <span class="text-gray-700 dark:text-gray-300">Defense</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="w-3 h-3 rounded-full {{ $researchProgress['milestones']['final_manuscript_submitted'] ? 'bg-green-500' : 'bg-gray-300' }}"></div>
+                                                    <span class="text-gray-700 dark:text-gray-300">Final</span>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        <!-- Pending Actions -->
+                                        @if(!empty($researchProgress['pending_actions']))
+                                            <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-6 mb-6 border border-yellow-200 dark:border-yellow-700">
+                                                <h4 class="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-4 flex items-center">
+                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Pending Actions
+                                                </h4>
+                                                <div class="space-y-3">
+                                                    @foreach($researchProgress['pending_actions'] as $action)
+                                                        <div class="flex items-start space-x-3 p-3 bg-yellow-100 dark:bg-yellow-800/30 rounded-lg">
+                                                            <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
+                                                            <div>
+                                                                <h5 class="font-medium text-yellow-900 dark:text-yellow-100">{{ $action['title'] }}</h5>
+                                                                <p class="text-sm text-yellow-700 dark:text-yellow-300">{{ $action['description'] }}</p>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <!-- Current Thesis Status -->
+                                        @if(isset($dashboardData['current_thesis_progress']))
+                                            @php $currentThesis = $dashboardData['current_thesis_progress']; @endphp
+                                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-6 border border-blue-200 dark:border-blue-700">
+                                                <div class="flex items-start gap-4">
+                                                    <div class="p-3 bg-blue-600 rounded-lg flex-shrink-0">
+                                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ $currentThesis->title }}</h3>
+                                                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                                                            {{ ucfirst(str_replace('_', ' ', $currentThesis->document_type)) }}
+                                                            @if($currentThesis->reviewed_by && $currentThesis->reviewer)
+                                                                - Under review by {{ $currentThesis->reviewer->name }}
+                                                            @endif
+                                                        </p>
+                                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200">
+                                                            {{ ucfirst(str_replace('_', ' ', $currentThesis->status)) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-8 mb-6 text-center">
+                                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Active Thesis</h3>
+                                                <p class="text-gray-600 dark:text-gray-400 mb-4">Start by submitting your thesis proposal</p>
+                                                <a href="{{ route('student.thesis.index') }}" class="inline-flex items-center px-6 py-3 btn-primary font-semibold rounded-lg transition duration-200 shadow-sm btn-text-gray-900 dark:text-white">
+                                                    Submit Thesis Document
+                                                </a>
+                                            </div>
+                                        @endif
+
+                                        <!-- All Documents Overview -->
+                                        @if($researchProgress['all_documents']->isNotEmpty())
+                                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 mb-6">
+                                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">All Documents</h4>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    @foreach($researchProgress['all_documents'] as $document)
+                                                        <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                                                            <div class="flex items-center space-x-3">
+                                                                <div class="w-3 h-3 rounded-full {{ $document->status === 'approved' ? 'bg-green-500' : ($document->status === 'pending' ? 'bg-yellow-500' : 'bg-red-500') }}"></div>
+                                                                <div>
+                                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ ucfirst(str_replace('_', ' ', $document->document_type)) }}</p>
+                                                                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ ucfirst(str_replace('_', ' ', $document->status)) }}</p>
+                                                                </div>
+                                                            </div>
+                                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $document->submission_date->format('M j') }}</span>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
                                     @endif
 
                                     <!-- Recent Activity with Better Spacing -->
@@ -1104,6 +1306,92 @@
                     updateIndicator.remove();
                 }, 500);
             }, 3000);
+        });
+    </script>
+    @endif
+
+    @if(Auth::user()->role === 'student')
+    <!-- Real-time Student Dashboard Updates -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to refresh student dashboard data
+            function refreshStudentDashboard() {
+                // Reload the page to get fresh data
+                window.location.reload();
+            }
+            
+            // Auto-refresh every 2 minutes for students
+            setInterval(refreshStudentDashboard, 120000);
+            
+            // Add manual refresh button functionality if it exists
+            const refreshButtons = document.querySelectorAll('[data-refresh="dashboard"]');
+            refreshButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<svg class="w-4 h-4 animate-spin inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Refreshing...';
+                    this.disabled = true;
+                    
+                    setTimeout(() => {
+                        refreshStudentDashboard();
+                    }, 1000);
+                });
+            });
+            
+            // Show live update indicator
+            const updateIndicator = document.createElement('div');
+            updateIndicator.className = 'fixed bottom-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg z-50';
+            updateIndicator.innerHTML = '🔄 Auto-refresh enabled';
+            document.body.appendChild(updateIndicator);
+            
+            // Hide indicator after 3 seconds
+            setTimeout(() => {
+                updateIndicator.style.opacity = '0';
+                setTimeout(() => {
+                    updateIndicator.remove();
+                }, 500);
+            }, 3000);
+        });
+    </script>
+    @endif
+
+    @if(Auth::user()->role === 'student')
+    <!-- Defense Notification JavaScript -->
+    <script>
+        // Function to view defense details
+        function viewDefenseDetails(assignmentId) {
+            // Redirect to defense details page or show modal
+            window.location.href = `/student/thesis/defense?assignment=${assignmentId}`;
+        }
+
+        // Function to dismiss defense notification
+        function dismissDefenseNotification() {
+            const notification = document.getElementById('defenseNotification');
+            if (notification) {
+                // Add fade out animation
+                notification.style.transition = 'opacity 0.3s ease-out';
+                notification.style.opacity = '0';
+                
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }
+
+        // Auto-dismiss notification after 30 seconds if not interacted with
+        document.addEventListener('DOMContentLoaded', function() {
+            const defenseNotification = document.getElementById('defenseNotification');
+            if (defenseNotification) {
+                // Add pulsing animation to draw attention
+                defenseNotification.style.animation = 'pulse 2s infinite';
+                
+                // Auto-dismiss after 30 seconds
+                setTimeout(() => {
+                    if (defenseNotification && defenseNotification.parentNode) {
+                        dismissDefenseNotification();
+                    }
+                }, 30000);
+            }
         });
     </script>
     @endif
