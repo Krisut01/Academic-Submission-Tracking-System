@@ -119,6 +119,25 @@ class DashboardController extends Controller
             $pendingDocuments = ThesisDocument::where('status', 'pending')->count();
             $approvedDocuments = ThesisDocument::where('status', 'approved')->count();
             
+            // Evaluation forms statistics
+            $pendingEvaluationForms = AcademicForm::where('form_type', 'evaluation')
+                ->where('status', 'pending')
+                ->count();
+            $underReviewEvaluationForms = AcademicForm::where('form_type', 'evaluation')
+                ->where('status', 'under_review')
+                ->count();
+            $approvedEvaluationForms = AcademicForm::where('form_type', 'evaluation')
+                ->where('status', 'approved')
+                ->count();
+            
+            // Recent evaluation forms for admin review
+            $recentEvaluationForms = AcademicForm::with(['user'])
+                ->where('form_type', 'evaluation')
+                ->whereIn('status', ['pending', 'under_review'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+            
             // Defense statistics
             $completedDefenses = PanelAssignment::where('status', 'completed')->count();
             $upcomingDefenses = PanelAssignment::where('status', 'scheduled')
@@ -153,6 +172,10 @@ class DashboardController extends Controller
                 'upcoming_defenses' => $upcomingDefenses,
                 'new_users_this_week' => $newUsersThisWeek,
                 'active_users_today' => $activeUsersToday,
+                'pending_evaluation_forms' => $pendingEvaluationForms,
+                'under_review_evaluation_forms' => $underReviewEvaluationForms,
+                'approved_evaluation_forms' => $approvedEvaluationForms,
+                'recent_evaluation_forms' => $recentEvaluationForms,
             ];
             
         } catch (\Exception $e) {
@@ -180,6 +203,10 @@ class DashboardController extends Controller
                 'upcoming_defenses' => 0,
                 'new_users_this_week' => 0,
                 'active_users_today' => 1,
+                'pending_evaluation_forms' => 0,
+                'under_review_evaluation_forms' => 0,
+                'approved_evaluation_forms' => 0,
+                'recent_evaluation_forms' => collect(),
             ];
         }
     }

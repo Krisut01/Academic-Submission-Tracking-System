@@ -323,14 +323,35 @@
                                     <!-- Status and Progress -->
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center space-x-2">
+                                            @php
+                                                // Get individual approval status
+                                                $approvalStatus = is_object($submission) ? $submission->calculateOverallApprovalStatus() : [];
+                                                $overallStatus = $approvalStatus['overall_status'] ?? $status;
+                                                $approvedCount = $approvalStatus['approved_count'] ?? 0;
+                                                $totalApprovals = $approvalStatus['total_approvals'] ?? 0;
+                                                
+                                                // Update status color based on overall status
+                                                $statusColor = match($overallStatus) {
+                                                    'pending' => 'yellow',
+                                                    'under_review' => 'blue',
+                                                    'approved' => 'green',
+                                                    'returned_for_revision' => 'red',
+                                                    default => 'gray'
+                                                };
+                                            @endphp
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-{{ $statusColor }}-100 dark:bg-{{ $statusColor }}-900/50 text-{{ $statusColor }}-800 dark:text-{{ $statusColor }}-200">
-                                                {{ ucfirst(str_replace('_', ' ', $status)) }}
+                                                {{ ucfirst(str_replace('_', ' ', $overallStatus)) }}
                                             </span>
-                                            @if($status === 'pending')
+                                            @if($totalApprovals > 0)
+                                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200">
+                                                    {{ $approvedCount }}/{{ $totalApprovals }} approved
+                                                </span>
+                                            @endif
+                                            @if($overallStatus === 'pending')
                                                 <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200">
                                                     Awaiting Review
                                                 </span>
-                                            @elseif($status === 'under_review')
+                                            @elseif($overallStatus === 'under_review')
                                                 <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200">
                                                     In Progress
                                                 </span>
@@ -603,8 +624,13 @@
                     review_comments: 'Document approved by faculty reviewer.'
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.success) {
                     // Show success message
                     showNotification('Document approved successfully!', 'success');
@@ -613,11 +639,13 @@
                         window.location.reload();
                     }, 1500);
                 } else {
+                    console.error('Server returned success: false', data);
                     throw new Error(data.message || 'Failed to approve document');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error details:', error);
+                console.error('Error message:', error.message);
                 showNotification('Failed to approve document. Please try again.', 'error');
                 button.innerHTML = originalText;
                 button.disabled = false;

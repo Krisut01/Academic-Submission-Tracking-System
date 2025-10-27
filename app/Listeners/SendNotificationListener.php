@@ -30,7 +30,10 @@ class SendNotificationListener
         $facultyAndAdmins = User::whereIn('role', ['faculty', 'admin'])->pluck('id')->toArray();
         
         $title = 'New Form Submission';
-        $message = "Student {$event->form->user->name} submitted a new {$event->form->form_type} form: {$event->form->title}";
+        $studentName = $event->form->user?->name ?? 'Unknown Student';
+        $formType = $event->form->form_type ?? 'form';
+        $formTitle = $event->form->title ?? 'Untitled Form';
+        $message = "Student {$studentName} submitted a new {$formType} form: {$formTitle}";
         
         Notification::createForUsers(
             $facultyAndAdmins,
@@ -39,8 +42,8 @@ class SendNotificationListener
             $message,
             [
                 'form_id' => $event->form->id,
-                'student_name' => $event->form->user->name,
-                'form_type' => $event->form->form_type,
+                'student_name' => $studentName,
+                'form_type' => $formType,
                 'url' => route('admin.records.show-form', $event->form)
             ],
             get_class($event->form),
@@ -55,26 +58,34 @@ class SendNotificationListener
     public function handleThesisSubmitted(ThesisSubmitted $event): void
     {
         // Notify faculty and admin about new thesis submission
-        $facultyAndAdmins = User::whereIn('role', ['faculty', 'admin'])->pluck('id')->toArray();
+        $facultyAndAdmins = User::whereIn('role', ['faculty', 'admin'])->get();
         
         $title = 'New Thesis Document Submitted';
-        $message = "Student {$event->document->user->name} submitted a new {$event->document->document_type}: {$event->document->title}";
+        $studentName = $event->document->user?->name ?? 'Unknown Student';
+        $documentType = $event->document->document_type ?? 'document';
+        $documentTitle = $event->document->title ?? 'Untitled Document';
+        $message = "Student {$studentName} submitted a new {$documentType}: {$documentTitle}";
         
-        Notification::createForUsers(
-            $facultyAndAdmins,
-            'thesis_submitted',
-            $title,
-            $message,
-            [
-                'document_id' => $event->document->id,
-                'student_name' => $event->document->user->name,
-                'document_type' => $event->document->document_type,
-                'url' => route('admin.records.show-document', $event->document)
-            ],
-            get_class($event->document),
-            $event->document->id,
-            'normal'
-        );
+        foreach ($facultyAndAdmins as $user) {
+            // Generate role-appropriate URL
+            $url = $this->generateThesisViewUrl($user->role, $event->document);
+            
+            Notification::createForUser(
+                $user->id,
+                'thesis_submitted',
+                $title,
+                $message,
+                [
+                    'document_id' => $event->document->id,
+                    'student_name' => $studentName,
+                    'document_type' => $documentType,
+                    'url' => $url
+                ],
+                get_class($event->document),
+                $event->document->id,
+                'normal'
+            );
+        }
     }
 
     /**
@@ -93,8 +104,9 @@ class SendNotificationListener
             default => 'Thesis Document Status Updated'
         };
         
-        $message = "Your thesis document '{$event->document->title}' has been {$event->newStatus}";
-        if ($reviewer) {
+        $documentTitle = $event->document->title ?? 'Untitled Document';
+        $message = "Your thesis document '{$documentTitle}' has been {$event->newStatus}";
+        if ($reviewer && $reviewer->name) {
             $message .= " by {$reviewer->name}";
         }
         
@@ -124,11 +136,14 @@ class SendNotificationListener
         // Also notify admin about the review completion
         $admins = User::where('role', 'admin')->pluck('id')->toArray();
         
+        $reviewerName = $reviewer?->name ?? 'Unknown Faculty';
+        $documentTitle = $event->document->title ?? 'Untitled Document';
+        
         Notification::createForUsers(
             $admins,
             'thesis_reviewed',
             'Thesis Document Reviewed',
-            "Faculty {$reviewer?->name} reviewed thesis document: {$event->document->title} (Status: {$event->newStatus})",
+            "Faculty {$reviewerName} reviewed thesis document: {$documentTitle} (Status: {$event->newStatus})",
             [
                 'document_id' => $event->document->id,
                 'student_name' => $student->name,
@@ -191,5 +206,18 @@ class SendNotificationListener
                 'normal'
             );
         }
+    }
+
+    /**
+     * Generate role-appropriate URL for viewing thesis documents
+     */
+    private function generateThesisViewUrl(string $role, $document): string
+    {
+        return match($role) {
+            'faculty' => route('faculty.thesis.show', $document),
+            'admin' => route('admin.records.show-document', $document),
+            'student' => route('student.thesis.show', $document),
+            default => route('faculty.thesis.show', $document) // Default to faculty view
+        };
     }
 }

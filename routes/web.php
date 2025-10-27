@@ -11,6 +11,75 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Test AJAX page
+Route::get('/test-ajax', function () {
+    return view('test-ajax');
+});
+
+// Test individual approvals page
+Route::get('/test-individual-approvals', function () {
+    return view('test-individual-approvals');
+});
+
+// Test faculty approval fix page
+Route::get('/test-faculty-approval-fix', function () {
+    return view('test-faculty-approval-fix');
+});
+
+// Test notification fix page
+Route::get('/test-notification-fix', function () {
+    return view('test-notification-fix');
+});
+
+// Test complete notification fix page
+Route::get('/test-notification-complete-fix', function () {
+    return view('test-notification-complete-fix');
+});
+
+// Test route for approval status
+Route::get('/test-approval', function () {
+    $document = App\Models\ThesisDocument::first();
+    if (!$document) {
+        return 'No documents found';
+    }
+    
+    $approvalStatus = $document->getApprovalStatus();
+    return view('components.approval-status', [
+        'approvalStatus' => $approvalStatus,
+        'title' => 'Test Approval Status'
+    ]);
+});
+
+// Test route for faculty approval
+Route::post('/test-faculty-approval', function (Illuminate\Http\Request $request) {
+    try {
+        $document = App\Models\ThesisDocument::first();
+        if (!$document) {
+            return response()->json(['success' => false, 'message' => 'No documents found'], 404);
+        }
+        
+        // Simulate approval
+        $document->update([
+            'status' => 'approved',
+            'reviewed_by' => 1, // Test faculty ID
+            'reviewed_at' => now(),
+            'review_comments' => 'Test approval'
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Test approval successful',
+            'status' => 'approved',
+            'document_id' => $document->id,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Test approval failed: ' . $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::get('/dashboard', function () {
     $user = Auth::user();
     $role = $user->role;
@@ -351,6 +420,10 @@ Route::middleware(['auth', 'verified'])->prefix('student')->name('student.')->gr
     Route::delete('/thesis/{document}/files/{fileIndex}', [ThesisDocumentController::class, 'removeFile'])->name('thesis.remove-file');
     Route::get('/thesis/{document}/download/{fileIndex}', [ThesisDocumentController::class, 'downloadFile'])->name('thesis.download');
     Route::post('/thesis/panel-assignment/{panelAssignment}/mark-completed', [ThesisDocumentController::class, 'markDefenseCompleted'])->name('thesis.mark-defense-completed');
+    Route::get('/thesis/{document}/approval-status', [ThesisDocumentController::class, 'getApprovalStatus'])->name('thesis.approval-status');
+    
+    // Get individual approval status for a document
+    Route::get('/thesis/{document}/individual-approval-status', [ThesisDocumentController::class, 'getIndividualApprovalStatus'])->name('thesis.individual-approval-status');
 });
 
 // Faculty Thesis Review Routes
@@ -390,6 +463,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/records/export/documents', [App\Http\Controllers\Admin\RecordsController::class, 'exportDocuments'])->name('records.export-documents');
     Route::get('/records/feedback/{type}/{id}', [App\Http\Controllers\Admin\RecordsController::class, 'feedbackLogs'])->name('records.feedback');
     
+    // Academic Form Approval Routes
+    Route::post('/records/forms/{form}/approve', [App\Http\Controllers\Admin\RecordsController::class, 'approveForm'])->name('records.approve-form');
+    Route::post('/records/forms/{form}/reject', [App\Http\Controllers\Admin\RecordsController::class, 'rejectForm'])->name('records.reject-form');
+    Route::post('/records/forms/{form}/under-review', [App\Http\Controllers\Admin\RecordsController::class, 'markUnderReview'])->name('records.mark-under-review');
+    
     // Defense Confirmation Routes
     Route::post('/records/documents/{document}/confirm-defense', [App\Http\Controllers\Admin\RecordsController::class, 'confirmDefense'])->name('records.confirm-defense');
     Route::post('/records/documents/{document}/mark-defended', [App\Http\Controllers\Admin\RecordsController::class, 'markProposalDefended'])->name('records.mark-defended');
@@ -413,6 +491,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::put('/panel/{assignment}', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'update'])->name('panel.update');
     Route::delete('/panel/{assignment}', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'destroy'])->name('panel.destroy');
     Route::post('/panel/{assignment}/notify', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'resendNotifications'])->name('panel.notify');
+    
+    // Panel Assignment Request Management
+    Route::post('/panel-requests/{document}/approve', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'approveRequest'])->name('panel-requests.approve');
+    Route::post('/panel-requests/{document}/reject', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'rejectRequest'])->name('panel-requests.reject');
+    
     Route::get('/panel/api/faculty', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'getAvailableFaculty'])->name('panel.api.faculty');
     Route::get('/panel/api/schedule', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'getSchedule'])->name('panel.api.schedule');
     Route::get('/panel/api/student-thesis/{studentId}', [App\Http\Controllers\Admin\PanelAssignmentController::class, 'getStudentThesis'])->name('panel.api.student-thesis');

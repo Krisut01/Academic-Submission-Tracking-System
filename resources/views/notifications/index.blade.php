@@ -148,25 +148,57 @@
 
                                 <!-- Action Button -->
                                 <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    @if($notification->type === 'defense_scheduled' && isset($notification->data['type']) && $notification->data['type'] === 'final_defense_scheduled')
-                                        <!-- Defense Scheduled - Go to Defense Details -->
-                                        <a href="{{ route('student.thesis.defense') }}" 
-                                           class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors duration-200">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    @php
+                                        // Generate role-appropriate URL
+                                        $actionUrl = $notification->data['url'] ?? null;
+                                        
+                                        // If no URL in data, generate based on user role and notification type
+                                        if (!$actionUrl) {
+                                            $userRole = Auth::user()->role;
+                                            
+                                            if ($notification->type === 'defense_scheduled' && isset($notification->data['type']) && $notification->data['type'] === 'final_defense_scheduled') {
+                                                $actionUrl = $userRole === 'student' ? route('student.thesis.defense') : route('faculty.panel-assignments.index');
+                                            } elseif (isset($notification->data['document_id'])) {
+                                                $documentId = $notification->data['document_id'];
+                                                $actionUrl = match($userRole) {
+                                                    'faculty' => route('faculty.thesis.show', $documentId),
+                                                    'admin' => route('admin.records.show-document', $documentId),
+                                                    'student' => route('student.thesis.show', $documentId),
+                                                    default => route('faculty.thesis.show', $documentId)
+                                                };
+                                            } else {
+                                                $actionUrl = match($userRole) {
+                                                    'faculty' => route('faculty.thesis.reviews'),
+                                                    'admin' => route('admin.records'),
+                                                    'student' => route('student.thesis.history'),
+                                                    default => route('faculty.thesis.reviews')
+                                                };
+                                            }
+                                        }
+                                        
+                                        // Determine button text and icon
+                                        $buttonText = 'View Details';
+                                        $buttonClass = 'bg-blue-600 hover:bg-blue-700';
+                                        
+                                        if ($notification->type === 'defense_scheduled') {
+                                            $buttonText = 'View Defense Details';
+                                            $buttonClass = 'bg-green-600 hover:bg-green-700';
+                                        } elseif (str_contains($notification->type, 'thesis')) {
+                                            $buttonText = 'View Thesis Details';
+                                        }
+                                    @endphp
+                                    
+                                    <a href="{{ $actionUrl }}" 
+                                       class="inline-flex items-center px-4 py-2 {{ $buttonClass }} text-white rounded-xl font-medium transition-colors duration-200">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            @if($notification->type === 'defense_scheduled')
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"></path>
-                                            </svg>
-                                            View Defense Details
-                                        </a>
-                                    @else
-                                        <!-- Default Action - Go to Thesis History -->
-                                        <a href="{{ route('student.thesis.history') }}" 
-                                           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors duration-200">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            @else
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                            </svg>
-                                            View Thesis Details
-                                        </a>
-                                    @endif
+                                            @endif
+                                        </svg>
+                                        {{ $buttonText }}
+                                    </a>
                                 </div>
                             </div>
                         </div>

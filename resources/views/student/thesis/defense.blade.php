@@ -173,23 +173,50 @@
                         @endif
 
                         <!-- Post-Defense Actions -->
-                        @if($panelAssignment->status === 'scheduled' && $panelAssignment->defense_date <= now())
+                        @if($panelAssignment->status === 'scheduled')
+                        @php
+                            $isDefenseToday = $panelAssignment->defense_date->isToday();
+                            $isDefensePassed = $panelAssignment->defense_date <= now();
+                            $isDefenseUpcoming = $panelAssignment->defense_date > now();
+                        @endphp
+                        
                         <div class="mt-8 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-700">
                             <div class="flex items-center justify-between">
-                                <div>
+                                <div class="flex-1">
                                     <h4 class="text-lg font-semibold text-green-900 dark:text-green-200 mb-2">🎓 Defense Completed?</h4>
-                                    <p class="text-green-800 dark:text-green-300">If you have completed your defense, mark it as done to proceed to the next step.</p>
+                                    
+                                    @if($isDefenseToday)
+                                        <p class="text-green-800 dark:text-green-300 mb-3">Today is your defense day! If you have completed your defense, mark it as done to proceed to the next step.</p>
+                                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 mb-3">
+                                            <p class="text-sm text-blue-800 dark:text-blue-300">
+                                                <strong>Scheduled for:</strong> {{ $panelAssignment->defense_date->format('F j, Y \a\t g:i A') }}
+                                            </p>
+                                        </div>
+                                    @elseif($isDefensePassed)
+                                        <p class="text-green-800 dark:text-green-300 mb-3">Your defense date has passed. If you have completed your defense, mark it as done to proceed to the next step.</p>
+                                    @else
+                                        <p class="text-green-800 dark:text-green-300 mb-3">Your defense is scheduled for <strong>{{ $panelAssignment->defense_date->format('F j, Y \a\t g:i A') }}</strong>. You can mark it as completed if you've already finished your defense.</p>
+                                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-3 mb-3">
+                                            <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                                                <strong>Note:</strong> You can mark your defense as completed even before the scheduled date for flexibility and accessibility.
+                                            </p>
+                                        </div>
+                                    @endif
                                 </div>
-                                <form method="POST" action="{{ route('student.thesis.mark-defense-completed', $panelAssignment) }}" class="ml-4">
-                                    @csrf
-                                    <button type="submit" 
-                                            class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors duration-200 shadow-lg hover:shadow-xl">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        Mark Defense as Completed
-                                    </button>
-                                </form>
+                                
+                                <div class="ml-4">
+                                    <form method="POST" action="{{ route('student.thesis.mark-defense-completed', $panelAssignment) }}">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors duration-200 shadow-lg hover:shadow-xl"
+                                                onclick="return confirm('Are you sure you have completed your defense? This action will mark your defense as completed and cannot be easily undone.')">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Mark Defense as Completed
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         @elseif($panelAssignment->status === 'completed')

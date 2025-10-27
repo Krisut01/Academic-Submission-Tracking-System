@@ -122,6 +122,9 @@
                 </div>
             </div>
 
+<!-- Individual Faculty Approvals -->
+<x-individual-approval-status :document="$document" />
+
             <!-- Document Metadata -->
             @if($document->document_metadata && count($document->document_metadata) > 0)
                 <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">

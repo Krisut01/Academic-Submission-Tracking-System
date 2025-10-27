@@ -153,49 +153,62 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                             </svg>
                         </div>
-                        Student Panel Assignment Requests ({{ $studentPanelRequests->count() }})
+                        Panel Assignment Requests Awaiting Review ({{ $studentPanelRequests->count() }})
                     </h3>
-                    <a href="{{ route('admin.records') }}?tab=thesis_documents&document_type=panel_assignment&status=approved" 
+                    <a href="{{ route('admin.records') }}?tab=thesis_documents&document_type=panel_assignment&status=pending" 
                        class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
                         View All →
                     </a>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     @foreach($studentPanelRequests as $request)
-                        @php
-                            // Check if student already has a panel assignment
-                            $existingPanel = \App\Models\PanelAssignment::where('student_id', $request->user_id)->first();
-                        @endphp
-                        <div class="bg-gradient-to-br {{ $existingPanel ? 'from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20' : 'from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20' }} rounded-lg p-4 border {{ $existingPanel ? 'border-green-200 dark:border-green-700' : 'border-yellow-200 dark:border-yellow-700' }}">
+                        <div class="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-700">
+                            <!-- Header with student info and status -->
                             <div class="flex items-start justify-between mb-3">
                                 <div class="flex-1">
-                                    <h4 class="font-medium text-gray-900 dark:text-white">{{ $request->user->name }}</h4>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="font-medium text-gray-900 dark:text-white">{{ $request->user->name }}</h4>
+                                        <span class="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full">Admin</span>
+                                    </div>
                                     <p class="text-sm text-gray-600 dark:text-gray-400">{{ $request->user->email }}</p>
                                 </div>
                                 <div class="flex flex-col items-end gap-1">
                                     <span class="text-xs bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded-full">
                                         {{ $request->submission_date->diffForHumans() }}
                                     </span>
-                                    @if($existingPanel)
-                                        <span class="text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
-                                            Panel Scheduled
-                                        </span>
-                                    @endif
+                                    <span class="text-xs bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded-full">
+                                        Pending
+                                    </span>
                                 </div>
                             </div>
                             
+                            <!-- Document details -->
                             <div class="mb-3">
-                                <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
                                     <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">{{ $request->title }}</p>
-                                    @if($request->defense_type)
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
-                                            {{ ucfirst(str_replace('_', ' ', $request->defense_type)) }}
-                                        </span>
-                                    @endif
                                 </div>
-                                @if($request->description)
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ Str::limit($request->description, 60) }}</p>
-                                @endif
+                                <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"></path>
+                                        </svg>
+                                        {{ $request->submission_date->format('M d, Y') }}
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{ $request->submission_date->diffForHumans() }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded-full">Pending</span>
+                                    <span class="text-xs bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded-full">Awaiting Review</span>
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Document ID: #{{ $request->id }}</div>
                             </div>
 
                             <!-- Show preferred panel members if available -->
@@ -214,18 +227,43 @@
                                 </div>
                             @endif
                             
-                            <div class="flex gap-2">
+                            <!-- Action Buttons -->
+                            <div class="space-y-2">
+                                <!-- View Details Button -->
                                 <a href="{{ route('admin.records.show-document', $request) }}" 
-                                   class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-xs font-medium transition duration-200 text-center">
+                                   class="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-xs font-medium transition duration-200 text-center flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
                                     View Details
                                 </a>
                                 
-                                @if(!$existingPanel)
-                                    <a href="{{ route('admin.panel.create', ['from_request' => $request->id]) }}" 
-                                       class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition duration-200 text-center">
-                                        Create Panel
-                                    </a>
-                                @endif
+                                <!-- Action Buttons Row -->
+                                <div class="flex gap-2">
+                                    <!-- Approve Button -->
+                                    <form action="{{ route('admin.panel-requests.approve', $request) }}" method="POST" class="flex-1">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition duration-200 text-center flex items-center justify-center gap-1"
+                                                onclick="return confirm('Approve this panel assignment request?')">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            Approve
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Reject Button -->
+                                    <button type="button" 
+                                            class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition duration-200 text-center flex items-center justify-center gap-1"
+                                            onclick="showRejectModal({{ $request->id }}, '{{ $request->user->name }}')">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Return
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -344,4 +382,68 @@
             </div>
         </div>
     </div>
+
+    <!-- Reject Modal -->
+    <div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <div class="mt-3">
+                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 dark:bg-red-900/50 rounded-full mb-4">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white text-center mb-2">Return Panel Assignment Request</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">
+                    Return this panel assignment request to <span id="studentName" class="font-medium"></span> for revision.
+                </p>
+                
+                <form id="rejectForm" method="POST">
+                    @csrf
+                    <div class="mb-4">
+                        <label for="comments" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Reason for Return (Required)
+                        </label>
+                        <textarea id="comments" 
+                                  name="comments" 
+                                  rows="4" 
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                  placeholder="Please provide specific feedback on what needs to be revised..."
+                                  required></textarea>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button type="button" 
+                                onclick="closeRejectModal()"
+                                class="flex-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md text-sm font-medium transition duration-200">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200">
+                            Return Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showRejectModal(documentId, studentName) {
+            document.getElementById('studentName').textContent = studentName;
+            document.getElementById('rejectForm').action = `/admin/panel-requests/${documentId}/reject`;
+            document.getElementById('rejectModal').classList.remove('hidden');
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.add('hidden');
+            document.getElementById('comments').value = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('rejectModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRejectModal();
+            }
+        });
+    </script>
 </x-app-layout> 

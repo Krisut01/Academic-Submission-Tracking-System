@@ -116,15 +116,46 @@
                     <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Visual representation of submission rates over time</p>
                 </div>
                 <div class="px-6 py-8">
-                    <div class="h-96 flex items-center justify-center">
+                    <div class="chart-container">
+                        <canvas id="submissionChart" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Summary -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">
+                <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity Summary</h3>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Key insights from the selected period</p>
+                </div>
+                <div class="px-6 py-5">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="text-center">
-                            <div class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                                </svg>
+                            <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                                {{ $data['total_submissions'] ?? 0 }}
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Chart Visualization</h3>
-                            <p class="text-gray-600 dark:text-gray-400">Interactive chart will be displayed here</p>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Total Submissions</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                {{ $data['year'] ?? date('Y') }} {{ ucfirst(is_string($data['period'] ?? 'monthly') ? $data['period'] : 'monthly') }}
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+                                {{ $data['academic_forms'] ?? 0 }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Academic Forms</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                {{ $data['total_submissions'] > 0 ? round((($data['academic_forms'] ?? 0) / $data['total_submissions']) * 100, 1) : 0 }}% of total
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-2">
+                                {{ $data['thesis_documents'] ?? 0 }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Thesis Documents</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                {{ $data['total_submissions'] > 0 ? round((($data['thesis_documents'] ?? 0) / $data['total_submissions']) * 100, 1) : 0 }}% of total
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -193,4 +224,258 @@
             </div>
         </div>
     </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Dark mode chart styling */
+        .dark #submissionChart {
+            background: rgba(17, 24, 39, 0.9);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        
+        /* Light mode chart styling */
+        #submissionChart {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        /* Chart container improvements */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        /* Dark mode specific adjustments */
+        .dark .chart-container {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.9) 100%);
+            border: 2px solid rgba(75, 85, 99, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Light mode specific adjustments */
+        .chart-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.98) 100%);
+            border: 2px solid rgba(209, 213, 219, 0.7);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('submissionChart').getContext('2d');
+            
+            // Detect dark mode with multiple checks
+            const hasDarkClass = document.documentElement.classList.contains('dark');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+            const isLightBackground = bodyBg.includes('255, 255, 255') || bodyBg.includes('rgb(255, 255, 255)') || 
+                                    bodyBg.includes('rgba(255, 255, 255') || bodyBg === 'white';
+            
+            // Check if the page is actually in dark mode by looking at the chart container
+            const chartContainer = document.querySelector('.chart-container');
+            const containerBg = chartContainer ? window.getComputedStyle(chartContainer).backgroundColor : '';
+            const isDarkContainer = containerBg.includes('17, 24, 39') || containerBg.includes('31, 41, 55') || 
+                                  containerBg.includes('rgba(17, 24, 39') || containerBg.includes('rgba(31, 41, 55');
+            
+            const isDarkMode = hasDarkClass || (prefersDark && !isLightBackground) || isDarkContainer;
+            
+            // Debug theme detection
+            console.log('Has dark class:', hasDarkClass);
+            console.log('Prefers dark:', prefersDark);
+            console.log('Is light background:', isLightBackground);
+            console.log('Is dark container:', isDarkContainer);
+            console.log('Container background:', containerBg);
+            console.log('Final isDarkMode:', isDarkMode);
+            console.log('Body background:', bodyBg);
+            
+            // Prepare chart data
+            const periods = @json($data['periods'] ?? []);
+            
+            // Check if we have data to display
+            if (!periods || periods.length === 0) {
+                ctx.fillStyle = '#000000'; // Always black for visibility
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available for the selected period', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            // Safely extract data with fallbacks
+            const labels = periods.map(p => p.label || 'Unknown');
+            const academicFormsData = periods.map(p => parseInt(p.academic_forms) || 0);
+            const thesisDocumentsData = periods.map(p => parseInt(p.thesis_documents) || 0);
+            
+            // Check if all data is zero
+            const totalData = [...academicFormsData, ...thesisDocumentsData];
+            const hasData = totalData.some(value => value > 0);
+            
+            if (!hasData) {
+                ctx.fillStyle = '#000000'; // Always black for visibility
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No submissions found for the selected period', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            // Define colors - text always black for visibility
+            const colors = {
+                academicForms: {
+                    border: isDarkMode ? '#10B981' : '#059669',
+                    background: isDarkMode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(5, 150, 105, 0.15)',
+                    point: isDarkMode ? '#10B981' : '#059669',
+                    pointBorder: '#ffffff'
+                },
+                thesisDocuments: {
+                    border: isDarkMode ? '#F59E0B' : '#D97706',
+                    background: isDarkMode ? 'rgba(245, 158, 11, 0.25)' : 'rgba(217, 119, 6, 0.15)',
+                    point: isDarkMode ? '#F59E0B' : '#D97706',
+                    pointBorder: '#ffffff'
+                },
+                text: '#000000', // Always black for visibility
+                textSecondary: '#000000', // Always black for visibility
+                grid: isDarkMode ? 'rgba(75, 85, 99, 0.6)' : 'rgba(107, 114, 128, 0.3)',
+                ticks: '#000000' // Always black for visibility
+            };
+            
+            console.log('Using colors:', colors);
+            console.log('Chart will use text color:', colors.text);
+            
+            // Create the chart
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Academic Forms',
+                            data: academicFormsData,
+                            borderColor: colors.academicForms.border,
+                            backgroundColor: colors.academicForms.background,
+                            pointBackgroundColor: colors.academicForms.point,
+                            pointBorderColor: colors.academicForms.pointBorder,
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.1,
+                            fill: true,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Thesis Documents',
+                            data: thesisDocumentsData,
+                            borderColor: colors.thesisDocuments.border,
+                            backgroundColor: colors.thesisDocuments.background,
+                            pointBackgroundColor: colors.thesisDocuments.point,
+                            pointBorderColor: colors.thesisDocuments.pointBorder,
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.1,
+                            fill: true,
+                            borderWidth: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Submission Trends Over Time',
+                            color: colors.text,
+                            font: {
+                                size: 20,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: colors.text,
+                                font: {
+                                    size: 15,
+                                    weight: '600'
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0,
+                                color: colors.ticks,
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Number of Submissions',
+                                color: colors.text,
+                                font: {
+                                    size: 16,
+                                    weight: '700'
+                                }
+                            },
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '{{ ucfirst(is_string($period) ? $period : 'monthly') }} Period',
+                                color: colors.text,
+                                font: {
+                                    size: 16,
+                                    weight: '700'
+                                }
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0,
+                                color: colors.ticks,
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                }
+                            },
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    elements: {
+                        point: {
+                            hoverBackgroundColor: '#ffffff',
+                            hoverBorderColor: '#000000',
+                            hoverBorderWidth: 3
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

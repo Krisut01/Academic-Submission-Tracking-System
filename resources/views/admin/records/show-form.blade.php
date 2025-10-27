@@ -219,6 +219,77 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Admin Approval Interface -->
+            @if($form->status === 'pending' || $form->status === 'under_review')
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">
+                    <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Admin Review & Approval</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Review and approve or reject this academic form</p>
+                    </div>
+                    <div class="px-6 py-5">
+                        <div class="space-y-6">
+                            <!-- Action Buttons -->
+                            <div class="flex flex-wrap gap-4">
+                                <!-- Approve Button -->
+                                <form method="POST" action="{{ route('admin.records.approve-form', $form) }}" class="inline">
+                                    @csrf
+                                    <div class="flex items-center space-x-3">
+                                        <textarea name="admin_comments" 
+                                                  placeholder="Optional comments for the student..."
+                                                  class="w-full max-w-md px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white"
+                                                  rows="3"></textarea>
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200"
+                                                onclick="return confirm('Are you sure you want to approve this form?')">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            Approve Form
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="flex flex-wrap gap-4">
+                                <!-- Reject Button -->
+                                <form method="POST" action="{{ route('admin.records.reject-form', $form) }}" class="inline">
+                                    @csrf
+                                    <div class="flex items-center space-x-3">
+                                        <textarea name="admin_comments" 
+                                                  placeholder="Required: Explain why this form is being rejected..."
+                                                  class="w-full max-w-md px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white"
+                                                  rows="3" required></textarea>
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200"
+                                                onclick="return confirm('Are you sure you want to reject this form?')">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                            Reject Form
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="flex flex-wrap gap-4">
+                                <!-- Mark Under Review Button -->
+                                <form method="POST" action="{{ route('admin.records.mark-under-review', $form) }}" class="inline">
+                                    @csrf
+                                    <button type="submit" 
+                                            class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                        Mark Under Review
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

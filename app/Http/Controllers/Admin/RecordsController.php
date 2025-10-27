@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RecordsController extends Controller
 {
@@ -149,6 +151,232 @@ class RecordsController extends Controller
         $this->ensureUserIsAdmin();
         $form->load(['user']);
         return view('admin.records.show-form', compact('form'));
+    }
+
+    /**
+     * Approve an academic form
+     */
+    public function approveForm(Request $request, AcademicForm $form)
+    {
+        $this->ensureUserIsAdmin();
+
+        $request->validate([
+            'admin_comments' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Update form status
+            $form->update([
+                'status' => 'approved',
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'review_comments' => $request->admin_comments,
+            ]);
+
+            // Log the activity
+            \App\Models\ActivityLog::create([
+                'user_id' => Auth::id(),
+                'event_type' => 'academic_form_approved',
+                'action' => 'approved_academic_form',
+                'model_type' => get_class($form),
+                'model_id' => $form->id,
+                'description' => "Approved {$form->form_type_label} for {$form->user->name}",
+                'metadata' => [
+                    'form_id' => $form->id,
+                    'form_type' => $form->form_type,
+                    'student_id' => $form->user_id,
+                    'admin_comments' => $request->admin_comments,
+                ],
+            ]);
+
+            // Notify student
+            try {
+                \App\Models\Notification::createForUser(
+                    $form->user_id,
+                    'form_approved',
+                    'Academic Form Approved',
+                    "Your {$form->form_type_label} has been approved by the administration.",
+                    [
+                        'form_id' => $form->id,
+                        'form_type' => $form->form_type,
+                        'admin_comments' => $request->admin_comments,
+                        'url' => route('student.forms.show', $form)
+                    ],
+                    get_class($form),
+                    $form->id,
+                    'high'
+                );
+                
+                Log::info('Notification sent to student for form approval', [
+                    'form_id' => $form->id,
+                    'student_id' => $form->user_id,
+                    'form_type' => $form->form_type
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send notification to student', [
+                    'form_id' => $form->id,
+                    'student_id' => $form->user_id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Academic form approved successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Failed to approve academic form', [
+                'form_id' => $form->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to approve form. Please try again.'])
+                ->withInput();
+        }
+    }
+
+    /**
+     * Reject an academic form
+     */
+    public function rejectForm(Request $request, AcademicForm $form)
+    {
+        $this->ensureUserIsAdmin();
+
+        $request->validate([
+            'admin_comments' => 'required|string|max:1000',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Update form status
+            $form->update([
+                'status' => 'rejected',
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'review_comments' => $request->admin_comments,
+            ]);
+
+            // Log the activity
+            \App\Models\ActivityLog::create([
+                'user_id' => Auth::id(),
+                'event_type' => 'academic_form_rejected',
+                'action' => 'rejected_academic_form',
+                'model_type' => get_class($form),
+                'model_id' => $form->id,
+                'description' => "Rejected {$form->form_type_label} for {$form->user->name}",
+                'metadata' => [
+                    'form_id' => $form->id,
+                    'form_type' => $form->form_type,
+                    'student_id' => $form->user_id,
+                    'admin_comments' => $request->admin_comments,
+                ],
+            ]);
+
+            // Notify student
+            try {
+                \App\Models\Notification::createForUser(
+                    $form->user_id,
+                    'form_rejected',
+                    'Academic Form Rejected',
+                    "Your {$form->form_type_label} has been rejected. Please review the comments and resubmit.",
+                    [
+                        'form_id' => $form->id,
+                        'form_type' => $form->form_type,
+                        'admin_comments' => $request->admin_comments,
+                        'url' => route('student.forms.show', $form)
+                    ],
+                    get_class($form),
+                    $form->id,
+                    'urgent'
+                );
+                
+                Log::info('Notification sent to student for form rejection', [
+                    'form_id' => $form->id,
+                    'student_id' => $form->user_id,
+                    'form_type' => $form->form_type
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send notification to student', [
+                    'form_id' => $form->id,
+                    'student_id' => $form->user_id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Academic form rejected. Student has been notified.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Failed to reject academic form', [
+                'form_id' => $form->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to reject form. Please try again.'])
+                ->withInput();
+        }
+    }
+
+    /**
+     * Mark academic form as under review
+     */
+    public function markUnderReview(AcademicForm $form)
+    {
+        $this->ensureUserIsAdmin();
+
+        try {
+            DB::beginTransaction();
+
+            // Update form status
+            $form->update([
+                'status' => 'under_review',
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+            ]);
+
+            // Log the activity
+            \App\Models\ActivityLog::create([
+                'user_id' => Auth::id(),
+                'event_type' => 'academic_form_under_review',
+                'action' => 'marked_form_under_review',
+                'model_type' => get_class($form),
+                'model_id' => $form->id,
+                'description' => "Marked {$form->form_type_label} as under review for {$form->user->name}",
+                'metadata' => [
+                    'form_id' => $form->id,
+                    'form_type' => $form->form_type,
+                    'student_id' => $form->user_id,
+                ],
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Academic form marked as under review.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Failed to mark academic form as under review', [
+                'form_id' => $form->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to mark form as under review. Please try again.']);
+        }
     }
 
     /**

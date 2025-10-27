@@ -163,9 +163,42 @@ class ThesisDocumentController extends Controller
             }
         }
         
+        // Check for error messages that might be stored as document title
+        $errorPatterns = [
+            'Attempt to read property',
+            'on string GET',
+            '127.0.0.1:8000',
+            'Undefined property',
+            'Call to undefined method',
+            'Fatal error',
+            'Parse error',
+            'Warning:',
+            'Notice:',
+            'Error:',
+        ];
+        
+        foreach ($fieldsToCheck as $field) {
+            if ($request->has($field)) {
+                $value = $request->input($field);
+                foreach ($errorPatterns as $pattern) {
+                    if (str_contains($value, $pattern)) {
+                        Log::warning('Error message detected in form field', [
+                            'field' => $field,
+                            'value' => $value,
+                            'pattern' => $pattern,
+                            'user_id' => Auth::id(),
+                        ]);
+                        
+                        return back()->with('error', 'Please fill out the form fields with proper information. Some fields contain invalid data.')
+                            ->withInput();
+                    }
+                }
+            }
+        }
+        
         // Base validation rules
         $rules = [
-            'document_type' => ['required', Rule::in(['proposal', 'approval_sheet', 'panel_assignment', 'final_manuscript'])],
+            'document_type' => ['required', Rule::in(['proposal', 'approval_sheet', 'panel_assignment', 'final_manuscript', 'evaluation_form'])],
             'student_id' => 'required|string|max:20',
             'full_name' => 'required|string|max:255',
             'course_program' => 'required|string|max:255',
@@ -251,6 +284,24 @@ class ThesisDocumentController extends Controller
                 if ($request->has_plagiarism_report) {
                     $rules['plagiarism_percentage'] = 'required|numeric|min:0|max:100';
                 }
+                break;
+
+            case 'evaluation_form':
+                $rules = array_merge($rules, [
+                    'academic_year' => 'required|string|max:255',
+                    'semester' => 'required|string|max:50',
+                    'completed_subjects' => 'required|array|min:1',
+                    'completed_subjects.*.subject_code' => 'required|string|max:20',
+                    'completed_subjects.*.subject_name' => 'required|string|max:255',
+                    'completed_subjects.*.units' => 'required|integer|min:1|max:10',
+                    'completed_subjects.*.grade' => 'required|string|max:5',
+                    'thesis_status' => 'required|string|in:completed,ongoing,defended',
+                    'thesis_grade' => 'nullable|string|max:5',
+                    'gpa' => 'required|numeric|min:0|max:4',
+                    'total_units_completed' => 'required|integer|min:1',
+                    'units_remaining' => 'required|integer|min:0',
+                    'expected_graduation' => 'required|date|after:today',
+                ]);
                 break;
         }
 
@@ -393,7 +444,7 @@ class ThesisDocumentController extends Controller
                 'version_number' => 1,
                 'status_history' => [[
                     'status' => 'pending',
-                    'changed_by' => Auth::user()->name,
+                    'changed_by' => Auth::user()?->name ?? 'System',
                     'changed_at' => now()->toISOString(),
                     'reason' => 'Initial submission',
                 ]],
@@ -413,6 +464,22 @@ class ThesisDocumentController extends Controller
                     'special_requirements' => $request->special_requirements,
                     'panel_justification' => $request->panel_justification,
                 ]);
+            }
+
+            // Validate document title before creation
+            if (empty($thesisDocumentData['title']) || 
+                str_contains($thesisDocumentData['title'], 'Attempt to read property') ||
+                str_contains($thesisDocumentData['title'], 'on string GET') ||
+                str_contains($thesisDocumentData['title'], '127.0.0.1:8000')) {
+                
+                Log::error('Invalid document title detected', [
+                    'title' => $thesisDocumentData['title'],
+                    'user_id' => Auth::id(),
+                    'document_type' => $request->document_type,
+                ]);
+                
+                return back()->with('error', 'Please provide a valid document title.')
+                    ->withInput();
             }
 
             // Create the thesis document
@@ -437,12 +504,12 @@ class ThesisDocumentController extends Controller
                 }
             }
 
-            // Create panel assignment and notify panel members for panel assignment requests
+            // Notify admins about panel assignment request (don't create panel assignment yet)
             if ($request->document_type === 'panel_assignment') {
                 try {
-                    $this->createPanelAssignmentAndNotify($thesisDocument);
+                    $this->notifyAdminForPanelRequest($thesisDocument);
                 } catch (\Exception $e) {
-                    Log::warning('Failed to create panel assignment and notify panel members', [
+                    Log::warning('Failed to notify admins about panel assignment request', [
                         'thesis_id' => $thesisDocument->id,
                         'error' => $e->getMessage(),
                     ]);
@@ -457,6 +524,43 @@ class ThesisDocumentController extends Controller
                 'file_count' => count($uploadedFiles),
                 'document_type' => $request->document_type,
             ]));
+
+            // For evaluation forms, also create an AcademicForm and fire FormSubmitted event
+            if ($request->document_type === 'evaluation_form') {
+                try {
+                    $academicForm = \App\Models\AcademicForm::create([
+                        'user_id' => Auth::id(),
+                        'form_type' => 'evaluation',
+                        'student_id' => $request->student_id,
+                        'title' => $request->title,
+                        'description' => $request->description,
+                        'status' => 'pending',
+                        'form_data' => $documentMetadata,
+                        'uploaded_files' => $uploadedFiles,
+                        'remarks' => $request->remarks,
+                        'submission_date' => $request->submission_date,
+                    ]);
+
+                    // Fire FormSubmitted event for admin notifications
+                    event(new \App\Events\FormSubmitted($academicForm, [
+                        'ip_address' => request()->ip(),
+                        'user_agent' => request()->userAgent(),
+                        'submission_method' => 'web_form',
+                        'file_count' => count($uploadedFiles),
+                        'form_type' => 'evaluation',
+                    ]));
+
+                    Log::info('Academic form created for evaluation form submission', [
+                        'academic_form_id' => $academicForm->id,
+                        'thesis_document_id' => $thesisDocument->id,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to create academic form for evaluation form submission', [
+                        'thesis_document_id' => $thesisDocument->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
 
             $successMessage = $this->getSuccessMessage($request->document_type);
 
@@ -860,6 +964,19 @@ class ThesisDocumentController extends Controller
                     'manuscript_notes' => $request->manuscript_notes,
                 ]);
 
+            case 'evaluation_form':
+                return array_merge($baseData, [
+                    'academic_year' => $request->academic_year,
+                    'semester' => $request->semester,
+                    'completed_subjects' => $request->completed_subjects,
+                    'thesis_status' => $request->thesis_status,
+                    'thesis_grade' => $request->thesis_grade,
+                    'gpa' => $request->gpa,
+                    'total_units_completed' => $request->total_units_completed,
+                    'units_remaining' => $request->units_remaining,
+                    'expected_graduation' => $request->expected_graduation,
+                ]);
+
             default:
                 return $baseData;
         }
@@ -907,6 +1024,7 @@ class ThesisDocumentController extends Controller
             'approval_sheet' => 'Approval sheet submitted successfully! The approval documentation has been recorded.',
             'panel_assignment' => 'Panel assignment request submitted successfully! The administration will review your request and assign panel members.',
             'final_manuscript' => 'Final manuscript submitted successfully! Your completed thesis is now under final review.',
+            'evaluation_form' => 'Evaluation form submitted successfully! Your academic evaluation is now under review by the administration.',
             default => 'Thesis document submitted successfully! Your submission is now under review.',
         };
     }
@@ -929,12 +1047,12 @@ class ThesisDocumentController extends Controller
                     'user_id' => $thesisDocument->adviser_id,
                     'type' => 'thesis_submission',
                     'title' => 'New Thesis Document Submission',
-                    'message' => "Student {$thesisDocument->full_name} has submitted a {$thesisDocument->document_type} for review.",
+                    'message' => "Student " . ($thesisDocument->full_name ?? 'Unknown Student') . " has submitted a " . ($thesisDocument->document_type ?? 'document') . " for review.",
                     'data' => [
                         'thesis_document_id' => $thesisDocument->id,
-                        'student_name' => $thesisDocument->full_name,
-                        'document_type' => $thesisDocument->document_type,
-                        'thesis_title' => $thesisDocument->title,
+                        'student_name' => $thesisDocument->full_name ?? 'Unknown Student',
+                        'document_type' => $thesisDocument->document_type ?? 'document',
+                        'thesis_title' => $thesisDocument->title ?? 'Untitled Document',
                     ],
                     'related_model_type' => 'ThesisDocument',
                     'related_model_id' => $thesisDocument->id,
@@ -1095,21 +1213,25 @@ class ThesisDocumentController extends Controller
             $admins = \App\Models\User::where('role', 'admin')->get();
             
             foreach ($admins as $admin) {
-                \App\Models\Notification::create([
-                    'user_id' => $admin->id,
-                    'type' => 'panel_assignment_request',
-                    'title' => 'Panel Assignment Request',
-                    'message' => "Student {$thesisDocument->full_name} has requested panel assignment for {$thesisDocument->document_type}.",
-                    'data' => [
-                        'thesis_document_id' => $thesisDocument->id,
-                        'student_name' => $thesisDocument->full_name,
-                        'document_type' => $thesisDocument->document_type,
-                        'thesis_title' => $thesisDocument->title,
+                $studentName = $thesisDocument->user?->name ?? 'Unknown Student';
+                $documentTitle = $thesisDocument->title ?? 'Untitled Document';
+                
+                \App\Models\Notification::createForUser(
+                    $admin->id,
+                    'panel_assignment_request',
+                    'Panel Assignment Request Submitted',
+                    "Student {$studentName} has submitted a panel assignment request for {$documentTitle}",
+                    [
+                        'document_id' => $thesisDocument->id,
+                        'student_name' => $studentName,
+                        'document_type' => $thesisDocument->document_type ?? 'document',
+                        'thesis_title' => $documentTitle,
+                        'url' => route('admin.records.show-document', $thesisDocument),
                     ],
-                    'related_model_type' => 'ThesisDocument',
-                    'related_model_id' => $thesisDocument->id,
-                    'priority' => 'high',
-                ]);
+                    get_class($thesisDocument),
+                    $thesisDocument->id,
+                    'normal'
+                );
             }
             
             Log::info('Admin notifications created successfully', [
@@ -1134,11 +1256,9 @@ class ThesisDocumentController extends Controller
             abort(403, 'Unauthorized access to this panel assignment.');
         }
 
-        // Check if defense date has passed
-        if ($panelAssignment->defense_date > now()) {
-            return redirect()->back()
-                ->withErrors(['defense' => 'Defense date has not yet passed. You can only mark defense as completed after the scheduled date.']);
-        }
+        // Allow flexibility - students can mark as completed even before scheduled date
+        // This provides accessibility for students who may have completed their defense early
+        // or need to mark it as completed for administrative purposes
 
         // Update panel assignment status
         $panelAssignment->update([
@@ -1190,7 +1310,77 @@ class ThesisDocumentController extends Controller
             );
         }
 
+        // Determine appropriate success message based on timing
+        $isEarlyCompletion = $panelAssignment->defense_date > now();
+        $successMessage = $isEarlyCompletion 
+            ? 'Defense marked as completed! You completed your defense before the scheduled date. You can now proceed to submit your approval sheet.'
+            : 'Defense marked as completed! You can now proceed to submit your approval sheet.';
+
         return redirect()->route('student.thesis.defense')
-            ->with('success', 'Defense marked as completed! You can now proceed to submit your approval sheet.');
+            ->with('success', $successMessage);
+    }
+
+    /**
+     * Get approval status details for a document
+     */
+    public function getApprovalStatus(ThesisDocument $document)
+    {
+        $this->ensureUserIsStudent();
+
+        // Check if the document belongs to the authenticated student
+        if ($document->user_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized access'], 403);
+        }
+
+        try {
+            $approvalStatus = $document->getApprovalStatus();
+            $html = view('components.approval-status', [
+                'approvalStatus' => $approvalStatus,
+                'title' => 'Approval Status for ' . $document->title
+            ])->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'approvalStatus' => $approvalStatus
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to get approval status', [
+                'document_id' => $document->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json(['success' => false, 'message' => 'Failed to load approval status'], 500);
+        }
+    }
+
+    public function getIndividualApprovalStatus(ThesisDocument $document)
+    {
+        $this->ensureUserIsStudent();
+
+        // Check if the document belongs to the authenticated student
+        if ($document->user_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized access'], 403);
+        }
+
+        try {
+            $approvalStatus = $document->calculateOverallApprovalStatus();
+            $html = view('components.individual-approval-status', [
+                'document' => $document
+            ])->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'approvalStatus' => $approvalStatus
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to get individual approval status', [
+                'document_id' => $document->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json(['success' => false, 'message' => 'Failed to load individual approval status'], 500);
+        }
     }
 }

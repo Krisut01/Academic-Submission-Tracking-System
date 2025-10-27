@@ -180,6 +180,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Document</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Approval Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Submitted</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Files</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
@@ -225,6 +226,37 @@
                                                 @else ❌ Needs Revision @endif
                                             </span>
                                         </td>
+
+                                        <!-- Approval Status -->
+                    <td class="px-6 py-4">
+                        @php
+                            $approvalStatus = $document->calculateOverallApprovalStatus();
+                        @endphp
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 relative mr-2">
+                                    <svg class="w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-gray-300 dark:text-gray-600" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                        <path class="text-{{ $approvalStatus['overall_status'] === 'approved' ? 'green' : ($approvalStatus['overall_status'] === 'returned_for_revision' ? 'red' : 'yellow') }}-600 dark:text-{{ $approvalStatus['overall_status'] === 'approved' ? 'green' : ($approvalStatus['overall_status'] === 'returned_for_revision' ? 'red' : 'yellow') }}-400" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="{{ $approvalStatus['completion_percentage'] }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $approvalStatus['completion_percentage'] }}%</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        @if($approvalStatus['overall_status'] === 'approved') All Approved
+                                        @elseif($approvalStatus['overall_status'] === 'returned_for_revision') Needs Revision
+                                        @elseif($approvalStatus['approved_count'] > 0) {{ $approvalStatus['approved_count'] }}/{{ $approvalStatus['total_approvals'] }} Approved
+                                        @else Pending Reviews
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="showIndividualApprovalDetails({{ $document->id }})"
+                                    class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs font-medium">
+                                View Details
+                            </button>
+                        </div>
+                    </td>
 
                                         <!-- Submission Date -->
                                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
@@ -295,4 +327,73 @@
             @endif
         </div>
     </div>
+
+    <!-- Approval Details Modal -->
+    <div id="approvalModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-2xl bg-white dark:bg-gray-800">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Approval Status Details</h3>
+                    <button onclick="closeApprovalModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="approvalContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showIndividualApprovalDetails(documentId) {
+        // Show loading state
+        document.getElementById('approvalContent').innerHTML = `
+            <div class="flex items-center justify-center py-8">
+                <svg class="animate-spin h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="ml-2 text-gray-600 dark:text-gray-400">Loading approval details...</span>
+            </div>
+        `;
+
+        document.getElementById('approvalModal').classList.remove('hidden');
+
+        // Fetch individual approval details
+        fetch(`/student/thesis/${documentId}/individual-approval-status`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('approvalContent').innerHTML = data.html;
+                } else {
+                    document.getElementById('approvalContent').innerHTML = `
+                        <div class="text-center py-8">
+                            <p class="text-red-600 dark:text-red-400">Failed to load approval details.</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('approvalContent').innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-red-600 dark:text-red-400">Error loading approval details.</p>
+                    </div>
+                `;
+            });
+    }
+
+        function closeApprovalModal() {
+            document.getElementById('approvalModal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('approvalModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeApprovalModal();
+            }
+        });
+    </script>
 </x-app-layout> 

@@ -470,33 +470,38 @@ class PanelAssignment extends Model
             $secretaryInfo = $this->secretary ? " Secretary: {$this->secretary->name}." : "";
             $defenseDateInfo = $this->defense_date ? " Defense scheduled for {$this->defense_date->format('F j, Y \a\t g:i A')} at {$this->defense_venue}." : "";
             
-            $panelNotification = [
-                'title' => 'Panel Assignment - Review Required',
-                'message' => "You have been assigned to review {$this->student->name}'s {$this->defense_type_label}.{$defenseDateInfo}{$secretaryInfo}",
-                'data' => [
-                    'panel_assignment_id' => $this->id,
-                    'student_name' => $this->student->name,
-                    'thesis_title' => $this->thesis_title,
-                    'defense_date' => $this->defense_date,
-                    'venue' => $this->defense_venue,
-                    'defense_type' => $this->defense_type,
-                    'defense_type_label' => $this->defense_type_label,
-                    'secretary_name' => $this->secretary?->name,
-                    'panel_chair_name' => $this->panelChair?->name,
-                    'url' => route('faculty.panel-assignments.show', $this),
-                ]
-            ];
+            // Get panel members with their roles for URL generation
+            $panelMemberUsers = User::whereIn('id', $allPanelMembers)->get();
+            
+            foreach ($panelMemberUsers as $member) {
+                $panelNotification = [
+                    'title' => 'Panel Assignment - Review Required',
+                    'message' => "You have been assigned to review {$this->student->name}'s {$this->defense_type_label}.{$defenseDateInfo}{$secretaryInfo}",
+                    'data' => [
+                        'panel_assignment_id' => $this->id,
+                        'student_name' => $this->student->name,
+                        'thesis_title' => $this->thesis_title,
+                        'defense_date' => $this->defense_date,
+                        'venue' => $this->defense_venue,
+                        'defense_type' => $this->defense_type,
+                        'defense_type_label' => $this->defense_type_label,
+                        'secretary_name' => $this->secretary?->name,
+                        'panel_chair_name' => $this->panelChair?->name,
+                        'url' => $this->generatePanelAssignmentUrl($member->role),
+                    ]
+                ];
 
-            Notification::createForUsers(
-                $allPanelMembers,
-                'panel_assignment_review',
-                $panelNotification['title'],
-                $panelNotification['message'],
-                $panelNotification['data'],
-                get_class($this),
-                $this->id,
-                'high'
-            );
+                Notification::createForUser(
+                    $member->id,
+                    'panel_assignment_review',
+                    $panelNotification['title'],
+                    $panelNotification['message'],
+                    $panelNotification['data'],
+                    get_class($this),
+                    $this->id,
+                    'high'
+                );
+            }
         }
 
         $this->update([
@@ -504,5 +509,18 @@ class PanelAssignment extends Model
             'panel_notified' => true,
             'notification_sent_at' => now(),
         ]);
+    }
+
+    /**
+     * Generate role-appropriate URL for panel assignment
+     */
+    private function generatePanelAssignmentUrl(string $role): string
+    {
+        return match($role) {
+            'faculty' => route('faculty.panel-assignments.show', $this),
+            'admin' => route('admin.panel.show', $this),
+            'student' => route('student.thesis.panel-assignment.show', $this),
+            default => route('faculty.panel-assignments.show', $this) // Default to faculty view
+        };
     }
 }

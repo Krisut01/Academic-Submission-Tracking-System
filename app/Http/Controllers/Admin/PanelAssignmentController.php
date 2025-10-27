@@ -75,15 +75,99 @@ class PanelAssignmentController extends Controller
             ->whereDoesntHave('panelAssignments')
             ->get();
 
-        // Get student panel assignment requests (pre-assignments)
+        // Get student panel assignment requests (pre-assignments) - PENDING status for admin review
         $studentPanelRequests = ThesisDocument::with(['user'])
             ->where('document_type', 'panel_assignment')
-            ->where('status', 'approved')
+            ->where('status', 'pending')
             ->orderBy('submission_date', 'desc')
             ->take(10)
             ->get();
 
         return view('admin.panel.index', compact('assignments', 'stats', 'studentsReadyForDefense', 'studentPanelRequests'));
+    }
+
+
+    /**
+     * Approve a panel assignment request
+     */
+    public function approveRequest(Request $request, ThesisDocument $document)
+    {
+        $this->ensureUserIsAdmin();
+
+        // Validate that this is a panel assignment request
+        if ($document->document_type !== 'panel_assignment') {
+            return back()->withErrors(['error' => 'This is not a panel assignment request.']);
+        }
+
+        // Update document status to approved
+        $document->update([
+            'status' => 'approved',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'review_comments' => $request->comments ?? 'Panel assignment request approved by admin.'
+        ]);
+
+        // Notify student about approval
+        \App\Models\Notification::createForUser(
+            $document->user_id,
+            'panel_request_approved',
+            'Panel Assignment Request Approved',
+            "Your panel assignment request has been approved. Admin will now assign panel members and schedule your defense.",
+            [
+                'document_id' => $document->id,
+                'admin_name' => Auth::user()->name,
+                'url' => route('student.thesis.panel-assignments')
+            ],
+            get_class($document),
+            $document->id,
+            'high'
+        );
+
+        return redirect()->back()->with('success', 'Panel assignment request approved successfully.');
+    }
+
+    /**
+     * Reject a panel assignment request
+     */
+    public function rejectRequest(Request $request, ThesisDocument $document)
+    {
+        $this->ensureUserIsAdmin();
+
+        // Validate that this is a panel assignment request
+        if ($document->document_type !== 'panel_assignment') {
+            return back()->withErrors(['error' => 'This is not a panel assignment request.']);
+        }
+
+        $request->validate([
+            'comments' => 'required|string|max:1000'
+        ]);
+
+        // Update document status to returned for revision
+        $document->update([
+            'status' => 'returned_for_revision',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'review_comments' => $request->comments
+        ]);
+
+        // Notify student about rejection
+        \App\Models\Notification::createForUser(
+            $document->user_id,
+            'panel_request_rejected',
+            'Panel Assignment Request Needs Revision',
+            "Your panel assignment request has been returned for revision. Please review the comments and resubmit.",
+            [
+                'document_id' => $document->id,
+                'admin_name' => Auth::user()->name,
+                'comments' => $request->comments,
+                'url' => route('student.thesis.panel-assignments')
+            ],
+            get_class($document),
+            $document->id,
+            'urgent'
+        );
+
+        return redirect()->back()->with('success', 'Panel assignment request rejected. Student has been notified to revise and resubmit.');
     }
 
     /**

@@ -74,10 +74,9 @@ class DashboardController extends Controller
                     })
                     // Panel assignment documents
                     ->orWhereIn('id', $panelDocumentIds)
-                    // Final manuscripts for students where faculty is panel member
-                    ->orWhere(function ($finalQuery) use ($studentIds) {
-                        $finalQuery->where('document_type', 'final_manuscript')
-                                   ->whereIn('user_id', $studentIds);
+                    // ALL documents for students where faculty is panel member
+                    ->orWhere(function ($panelQuery) use ($studentIds) {
+                        $panelQuery->whereIn('user_id', $studentIds);
                     });
                 })
                 ->with('user')

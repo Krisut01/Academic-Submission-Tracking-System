@@ -25,11 +25,11 @@
                     <div class="mt-4 grid grid-cols-3 gap-4 text-xs">
                         <div>
                             <p class="text-gray-600 dark:text-gray-400">Students</p>
-                            <p class="font-semibold text-gray-900 dark:text-white">{{ $stats['students'] ?? 0 }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ $stats['active_students'] ?? 0 }}</p>
                         </div>
                         <div>
                             <p class="text-gray-600 dark:text-gray-400">Faculty</p>
-                            <p class="font-semibold text-gray-900 dark:text-white">{{ $stats['faculty'] ?? 0 }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ $stats['active_faculty'] ?? 0 }}</p>
                         </div>
                         <div>
                             <p class="text-gray-600 dark:text-gray-400">Admins</p>

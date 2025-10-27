@@ -117,16 +117,8 @@
                     <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Visual representation of approval rates over time</p>
                 </div>
                 <div class="px-6 py-8">
-                    <div class="h-96 flex items-center justify-center">
-                        <div class="text-center">
-                            <div class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Chart Visualization</h3>
-                            <p class="text-gray-600 dark:text-gray-400">Interactive chart will be displayed here</p>
-                        </div>
+                    <div class="chart-container">
+                        <canvas id="approvalTrendsChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -262,4 +254,230 @@
             </div>
         </div>
     </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.98) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 2px solid rgba(209, 213, 219, 0.7);
+        }
+        
+        .dark .chart-container {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.9) 100%);
+            border: 2px solid rgba(75, 85, 99, 0.5);
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('approvalTrendsChart').getContext('2d');
+            
+            // Detect dark mode
+            const hasDarkClass = document.documentElement.classList.contains('dark');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+            const isLightBackground = bodyBg.includes('255, 255, 255') || bodyBg.includes('rgb(255, 255, 255)') || 
+                                    bodyBg.includes('rgba(255, 255, 255') || bodyBg === 'white';
+            
+            const isDarkMode = hasDarkClass || (prefersDark && !isLightBackground);
+            
+            // Prepare chart data
+            const trends = @json($data['trends'] ?? []);
+            
+            if (trends.length === 0) {
+                // Show no data message
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#000000'; // Always black for visibility
+                ctx.textAlign = 'center';
+                ctx.fillText('No approval trends data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            // Define colors - text always black for visibility
+            const colors = {
+                approved: {
+                    border: isDarkMode ? '#10B981' : '#059669',
+                    background: isDarkMode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(5, 150, 105, 0.15)',
+                    point: isDarkMode ? '#10B981' : '#059669'
+                },
+                rejected: {
+                    border: isDarkMode ? '#EF4444' : '#DC2626',
+                    background: isDarkMode ? 'rgba(239, 68, 68, 0.25)' : 'rgba(220, 38, 38, 0.15)',
+                    point: isDarkMode ? '#EF4444' : '#DC2626'
+                },
+                submitted: {
+                    border: isDarkMode ? '#3B82F6' : '#2563EB',
+                    background: isDarkMode ? 'rgba(59, 130, 246, 0.25)' : 'rgba(37, 99, 235, 0.15)',
+                    point: isDarkMode ? '#3B82F6' : '#2563EB'
+                },
+                text: '#000000', // Always black for visibility
+                textSecondary: '#000000', // Always black for visibility
+                grid: isDarkMode ? 'rgba(75, 85, 99, 0.6)' : 'rgba(107, 114, 128, 0.3)',
+                ticks: '#000000' // Always black for visibility
+            };
+            
+            // Extract data for chart
+            const labels = trends.map(trend => trend.period);
+            const submittedData = trends.map(trend => trend.submitted);
+            const approvedData = trends.map(trend => trend.approved);
+            const rejectedData = trends.map(trend => trend.rejected);
+            
+            // Create the chart
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Submitted',
+                            data: submittedData,
+                            borderColor: colors.submitted.border,
+                            backgroundColor: colors.submitted.background,
+                            pointBackgroundColor: colors.submitted.point,
+                            pointBorderColor: colors.submitted.point,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Approved',
+                            data: approvedData,
+                            borderColor: colors.approved.border,
+                            backgroundColor: colors.approved.background,
+                            pointBackgroundColor: colors.approved.point,
+                            pointBorderColor: colors.approved.point,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Rejected',
+                            data: rejectedData,
+                            borderColor: colors.rejected.border,
+                            backgroundColor: colors.rejected.background,
+                            pointBackgroundColor: colors.rejected.point,
+                            pointBorderColor: colors.rejected.point,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Approval Trends Over Time',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: colors.text
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: {
+                                    size: 14,
+                                    weight: '500'
+                                },
+                                color: colors.text,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)', // Always white background for black text
+                            titleColor: '#000000', // Always black
+                            bodyColor: '#000000', // Always black
+                            borderColor: 'rgba(209, 213, 219, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const trend = trends[context.dataIndex];
+                                    const approvalRate = trend.approval_rate || 0;
+                                    return `Approval Rate: ${approvalRate}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Time Period',
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                color: colors.text
+                            },
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: colors.ticks,
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Submissions',
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                color: colors.text
+                            },
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: colors.ticks,
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>
