@@ -18,9 +18,9 @@
             </style>
         @endif
     </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
+    <header class="bg-white dark:bg-gray-800 shadow-sm">
         <div class="container mx-auto px-4 lg:px-8 py-4">
             <div class="flex justify-between items-center">
                 <!-- Logo/Brand -->
@@ -30,28 +30,43 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
-                    <h1 class="text-xl font-bold text-gray-900">RMT Generation System</h1>
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">RMT Generation System</h1>
                 </div>
 
-                <!-- Navigation for authenticated users -->
-            @if (Route::has('login'))
-                    <nav class="flex items-center gap-4">
-                    @auth
-                            <a href="{{ url('/dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium transition">
-                            Dashboard
-                        </a>
-                    @else
-                            <a href="#login" class="text-gray-700 hover:text-blue-600 font-medium transition">
-                                Login
-                            </a>
-                        @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                    Sign Up
-                            </a>
-                        @endif
-                    @endauth
-                </nav>
-            @endif
+                <!-- Right side: Dark Mode Toggle + Navigation -->
+                <div class="flex items-center gap-4">
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" class="relative inline-flex items-center justify-center w-9 h-9 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 ease-in-out" title="Toggle dark mode">
+                        <!-- Sun Icon (visible in dark mode) -->
+                        <svg id="sun-icon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <!-- Moon Icon (visible in light mode) -->
+                        <svg id="moon-icon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+
+                    <!-- Navigation for authenticated users -->
+                    @if (Route::has('login'))
+                        <nav class="flex items-center gap-4">
+                            @auth
+                                <a href="{{ url('/dashboard') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 font-medium transition">
+                                    Dashboard
+                                </a>
+                            @else
+                                <a href="#login" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 font-medium transition">
+                                    Login
+                                </a>
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" class="bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                        Sign Up
+                                    </a>
+                                @endif
+                            @endauth
+                        </nav>
+                    @endif
+                </div>
             </div>
         </div>
         </header>
@@ -64,11 +79,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                     <!-- Content -->
                     <div class="text-center md:text-left">
-                        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6">
                             Professional Test Creation Made
                             <span class="text-blue-600">Simple</span>
                         </h2>
-                        <p class="text-xl text-gray-600 mb-8">
+                        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
                             Create, manage, and distribute professional examinations with our comprehensive RMT (Registered Medical Technologist) Generation System. Streamline your assessment process with powerful tools designed for educators and professionals.
                         </p>
                         
@@ -80,7 +95,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700">Automated test generation</span>
+                                <span class="text-gray-700 dark:text-gray-300">Automated test generation</span>
                             </div>
                             <div class="flex items-center gap-3 justify-center md:justify-start">
                                 <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
@@ -88,7 +103,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700">Role-based access control</span>
+                                <span class="text-gray-700 dark:text-gray-300">Role-based access control</span>
                             </div>
                             <div class="flex items-center gap-3 justify-center md:justify-start">
                                 <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
@@ -96,27 +111,27 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700">Comprehensive analytics</span>
+                                <span class="text-gray-700 dark:text-gray-300">Comprehensive analytics</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Login Form -->
-                    <div id="login" class="bg-white p-8 rounded-xl shadow-xl max-w-md mx-auto md:mx-0 md:ml-8">
+                    <div id="login" class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl max-w-md mx-auto md:mx-0 md:ml-8">
                         <div class="text-center mb-8">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h3>
-                            <p class="text-gray-600">Sign in to access your account</p>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h3>
+                            <p class="text-gray-600 dark:text-gray-300">Sign in to access your account</p>
                         </div>
                         
                         <!-- Session Status -->
                         @if (session('status'))
-                            <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                <p class="text-green-700 text-sm">{{ session('status') }}</p>
+                            <div class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+                                <p class="text-green-700 dark:text-green-300 text-sm">{{ session('status') }}</p>
                             </div>
                         @endif
 
@@ -126,16 +141,16 @@
 
                             <!-- Role Selection -->
                             <div>
-                                <label for="role" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label for="role" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                     <div class="flex items-center gap-2">
-                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                                         </svg>
                                         Select Your Role
                                     </div>
                                 </label>
                                 <select name="role" id="role" required 
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition bg-white">
+                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                     <option value="">Choose your role...</option>
                                     <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>
                                         🎓 Student - Take examinations and view results
@@ -148,15 +163,15 @@
                                     </option>
                                 </select>
                                 @error('role')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <!-- Email Address -->
                             <div>
-                                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                     <div class="flex items-center gap-2">
-                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                                         </svg>
                                         Email Address
@@ -164,7 +179,7 @@
                                 </label>
                                 <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" 
                                        placeholder="Enter your email address"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                                 @error('email')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -172,9 +187,9 @@
 
                             <!-- Password -->
                             <div>
-                                <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                     <div class="flex items-center gap-2">
-                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                         </svg>
                                         Password
@@ -182,7 +197,7 @@
                                 </label>
                                 <input id="password" type="password" name="password" required autocomplete="current-password"
                                        placeholder="Enter your password"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                                 @error('password')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -191,8 +206,8 @@
                             <!-- Remember Me & Forgot Password -->
                             <div class="flex items-center justify-between">
                                 <label class="flex items-center">
-                                    <input type="checkbox" name="remember" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                                    <input type="checkbox" name="remember" class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">Remember me</span>
                                 </label>
 
                                 @if (Route::has('password.request'))
@@ -216,7 +231,7 @@
                         <!-- Register Link -->
                         @if (Route::has('register'))
                             <div class="mt-6 text-center">
-                                <p class="text-sm text-gray-600">
+                                <p class="text-sm text-gray-600 dark:text-gray-300">
                                     Don't have an account? 
                                     <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-700 font-medium transition">
                                         Create one here
@@ -230,11 +245,11 @@
         </section>
 
         <!-- Features Section -->
-        <section class="py-16 bg-white">
+        <section class="py-16 bg-white dark:bg-gray-800">
             <div class="container mx-auto px-4 lg:px-8">
                 <div class="text-center mb-12">
-                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Why Choose RMT Generation System?</h3>
-                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Choose RMT Generation System?</h3>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                         Our platform provides everything you need to create, manage, and administer professional medical technology examinations.
                     </p>
                 </div>
@@ -242,35 +257,35 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Feature 1 -->
                     <div class="text-center p-6">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                         </div>
-                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Smart Test Generation</h4>
-                        <p class="text-gray-600">Automatically generate professional-grade examinations with customizable difficulty levels and topic coverage.</p>
+                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Smart Test Generation</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Automatically generate professional-grade examinations with customizable difficulty levels and topic coverage.</p>
                     </div>
 
                     <!-- Feature 2 -->
                     <div class="text-center p-6">
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                         </div>
-                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Secure Assessment</h4>
-                        <p class="text-gray-600">Advanced security features ensure the integrity of your examinations with anti-cheating mechanisms.</p>
+                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Secure Assessment</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Advanced security features ensure the integrity of your examinations with anti-cheating mechanisms.</p>
                     </div>
 
                     <!-- Feature 3 -->
                     <div class="text-center p-6">
-                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                         </div>
-                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Analytics & Reporting</h4>
-                        <p class="text-gray-600">Comprehensive analytics help you understand student performance and improve your teaching methods.</p>
+                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Analytics & Reporting</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Comprehensive analytics help you understand student performance and improve your teaching methods.</p>
                     </div>
                 </div>
             </div>
@@ -296,5 +311,32 @@
             </div>
         </div>
     </footer>
-    </body>
+
+<script>
+function toggleDarkMode() {
+    const html = document.documentElement;
+    const isDark = html.classList.contains('dark');
+    
+    if (isDark) {
+        html.classList.remove('dark');
+        localStorage.setItem('darkMode', 'false');
+    } else {
+        html.classList.add('dark');
+        localStorage.setItem('darkMode', 'true');
+    }
+}
+
+// Initialize dark mode on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const darkMode = localStorage.getItem('darkMode');
+    const html = document.documentElement;
+    
+    if (darkMode === 'true' || (!darkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        html.classList.add('dark');
+    } else {
+        html.classList.remove('dark');
+    }
+});
+</script>
+</body>
 </html>

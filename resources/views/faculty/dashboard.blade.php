@@ -8,20 +8,20 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <!-- Welcome Section with Real-time Features -->
         <div class="mb-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900">Welcome back, {{ Auth::user()->name }}!</h1>
-                            <p class="mt-2 text-gray-600">Here's your overview of thesis management activities for your assigned students.</p>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {{ Auth::user()->name }}!</h1>
+                            <p class="mt-2 text-gray-600 dark:text-gray-300">Here's your overview of thesis management activities for your assigned students.</p>
                         </div>
                         <div class="flex items-center space-x-4">
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Last login</p>
-                                <p class="text-sm font-medium text-gray-900">{{ Auth::user()->updated_at->diffForHumans() }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Last login</p>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ Auth::user()->updated_at->diffForHumans() }}</p>
                             </div>
-                            <div class="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="h-12 w-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
                             </div>
@@ -31,7 +31,7 @@
                     <div class="mt-4 flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                            <span class="text-sm text-gray-600" id="live-indicator">🟢 Live Updates</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-300" id="live-indicator">🟢 Live Updates</span>
                         </div>
                         <button onclick="refreshFacultyDashboard()" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,47 +150,47 @@
 
         <!-- Faculty Assignment Overview -->
         <div class="mb-8">
-            <div class="bg-white rounded-lg shadow-sm border">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Your Faculty Assignments</h3>
-                    <p class="text-sm text-gray-500">Documents and students specifically assigned to you</p>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Your Faculty Assignments</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Documents and students specifically assigned to you</p>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <!-- Adviser Role -->
-                        <div class="text-center p-4 bg-blue-50 rounded-lg">
-                            <div class="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-3">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div class="w-12 h-12 mx-auto bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
                             </div>
-                            <h4 class="text-sm font-medium text-gray-900">Adviser</h4>
-                            <p class="text-xs text-gray-500">Thesis supervision</p>
-                            <p class="text-lg font-semibold text-blue-600 mt-1">{{ $dashboardData['assigned_students'] ?? 0 }}</p>
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">Adviser</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Thesis supervision</p>
+                            <p class="text-lg font-semibold text-blue-600 dark:text-blue-400 mt-1">{{ $dashboardData['assigned_students'] ?? 0 }}</p>
                         </div>
 
                         <!-- Reviewer Role -->
-                        <div class="text-center p-4 bg-green-50 rounded-lg">
-                            <div class="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-3">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div class="w-12 h-12 mx-auto bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
-                            <h4 class="text-sm font-medium text-gray-900">Reviewer</h4>
-                            <p class="text-xs text-gray-500">Document review</p>
-                            <p class="text-lg font-semibold text-green-600 mt-1">{{ $dashboardData['pending_reviews'] ?? 0 }}</p>
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">Reviewer</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Document review</p>
+                            <p class="text-lg font-semibold text-green-600 dark:text-green-400 mt-1">{{ $dashboardData['pending_reviews'] ?? 0 }}</p>
                         </div>
 
                         <!-- Panel Member Role -->
-                        <div class="text-center p-4 bg-purple-50 rounded-lg">
-                            <div class="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-3">
-                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                            <div class="w-12 h-12 mx-auto bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                                 </svg>
                             </div>
-                            <h4 class="text-sm font-medium text-gray-900">Panel Member</h4>
-                            <p class="text-xs text-gray-500">Defense evaluation</p>
-                            <p class="text-lg font-semibold text-purple-600 mt-1">{{ $dashboardData['this_week_activity'] ?? 0 }}</p>
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">Panel Member</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Defense evaluation</p>
+                            <p class="text-lg font-semibold text-purple-600 dark:text-purple-400 mt-1">{{ $dashboardData['this_week_activity'] ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -202,15 +202,15 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Recent Submissions -->
             <div class="lg:col-span-2">
-                <div class="bg-white rounded-lg shadow-sm border">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900">Student Documents Requiring Review</h3>
-                                <p class="text-sm text-gray-600 mt-1">Review and provide feedback on student thesis submissions</p>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Student Documents Requiring Review</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Review and provide feedback on student thesis submissions</p>
                             </div>
                             <div class="flex items-center space-x-3">
-                                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                                     <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
                                     <span>{{ $dashboardData['pending_reviews'] ?? 0 }} pending</span>
                                 </div>
@@ -223,7 +223,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="divide-y divide-gray-200">
+                    <div class="divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse($dashboardData['recent_submissions'] ?? [] as $submission)
                         @php
                             // Handle both object and array data structures
@@ -275,7 +275,7 @@
                                 }
                             }
                         @endphp
-                        <div class="px-6 py-6 border-l-4 border-{{ $statusColor }}-400 bg-{{ $statusColor }}-50 hover:bg-{{ $statusColor }}-100 transition-colors duration-200">
+                        <div class="px-6 py-6 border-l-4 border-{{ $statusColor }}-400 bg-{{ $statusColor }}-50 dark:bg-{{ $statusColor }}-900/20 hover:shadow-lg hover:border-{{ $statusColor }}-500 dark:hover:border-{{ $statusColor }}-300 transition-all duration-200">
                             <div class="flex items-start justify-between">
                                 <div class="flex-1 min-w-0">
                                     <!-- Student Info Header -->
@@ -285,14 +285,14 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center space-x-2 mb-1">
-                                                <h4 class="text-lg font-semibold text-gray-900 truncate">
+                                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
                                                     {{ $studentName }}
                                                 </h4>
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200">
                                                     {{ $facultyRole }}
                                                 </span>
                                             </div>
-                                            <p class="text-sm text-gray-600 truncate font-medium">
+                                            <p class="text-sm text-gray-600 dark:text-gray-300 truncate font-medium">
                                                 {{ $title }}
                                             </p>
                                         </div>
@@ -304,40 +304,40 @@
                                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                             </svg>
-                                            <span class="text-sm text-gray-600">{{ $documentTypeLabel }}</span>
+                                            <span class="text-sm text-gray-600 dark:text-gray-300">{{ $documentTypeLabel }}</span>
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            <span class="text-sm text-gray-600">{{ $submissionDate->format('M j, Y') }}</span>
+                                            <span class="text-sm text-gray-600 dark:text-gray-300">{{ $submissionDate->format('M j, Y') }}</span>
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            <span class="text-sm text-gray-600">{{ $submissionDate->diffForHumans() }}</span>
+                                            <span class="text-sm text-gray-600 dark:text-gray-300">{{ $submissionDate->diffForHumans() }}</span>
                                         </div>
                                     </div>
 
                                     <!-- Status and Progress -->
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center space-x-2">
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-{{ $statusColor }}-100 text-{{ $statusColor }}-800">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-{{ $statusColor }}-100 dark:bg-{{ $statusColor }}-900/50 text-{{ $statusColor }}-800 dark:text-{{ $statusColor }}-200">
                                                 {{ ucfirst(str_replace('_', ' ', $status)) }}
                                             </span>
                                             @if($status === 'pending')
-                                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200">
                                                     Awaiting Review
                                                 </span>
                                             @elseif($status === 'under_review')
-                                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200">
                                                     In Progress
                                                 </span>
                                             @endif
                                         </div>
                                         <div class="text-right">
-                                            <p class="text-xs text-gray-500">Document ID: #{{ is_object($submission) ? $submission->id : ($submission['id'] ?? 'N/A') }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Document ID: #{{ is_object($submission) ? $submission->id : ($submission['id'] ?? 'N/A') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -387,8 +387,8 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900">No submissions</h3>
-                            <p class="mt-1 text-sm text-gray-500">No recent submissions requiring your review.</p>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No submissions</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No recent submissions requiring your review.</p>
                         </div>
                         @endforelse
                     </div>
@@ -398,55 +398,55 @@
             <!-- Quick Actions & Notifications -->
             <div class="space-y-6">
                 <!-- Quick Actions -->
-                <div class="bg-white rounded-lg shadow-sm border">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Quick Actions</h3>
                     </div>
                     <div class="p-6 space-y-4">
-                        <a href="{{ route('faculty.thesis.reviews') }}" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <a href="{{ route('faculty.thesis.reviews') }}" class="flex items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800/30 transition-colors">
                             <div class="flex-shrink-0">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <p class="text-sm font-medium text-blue-900">Review Thesis Documents</p>
-                                <p class="text-xs text-blue-700">Review pending submissions</p>
+                                <p class="text-sm font-medium text-blue-900 dark:text-blue-100">Review Thesis Documents</p>
+                                <p class="text-xs text-blue-700 dark:text-blue-300">Review pending submissions</p>
                             </div>
                         </a>
 
-                        <a href="{{ route('faculty.thesis.progress') }}" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <a href="{{ route('faculty.thesis.progress') }}" class="flex items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-800/30 transition-colors">
                             <div class="flex-shrink-0">
-                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <p class="text-sm font-medium text-green-900">Track Student Progress</p>
-                                <p class="text-xs text-green-700">Monitor thesis progress</p>
+                                <p class="text-sm font-medium text-green-900 dark:text-green-100">Track Student Progress</p>
+                                <p class="text-xs text-green-700 dark:text-green-300">Monitor thesis progress</p>
                             </div>
                         </a>
 
-                        <a href="{{ route('notifications.index') }}" class="flex items-center p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                        <a href="{{ route('notifications.index') }}" class="flex items-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-800/30 transition-colors">
                             <div class="flex-shrink-0">
-                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <p class="text-sm font-medium text-orange-900">View Notifications</p>
-                                <p class="text-xs text-orange-700">Check system alerts</p>
+                                <p class="text-sm font-medium text-orange-900 dark:text-orange-100">View Notifications</p>
+                                <p class="text-xs text-orange-700 dark:text-orange-300">Check system alerts</p>
                             </div>
                         </a>
                     </div>
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="bg-white rounded-lg shadow-sm border">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Activity</h3>
                     </div>
-                    <div class="divide-y divide-gray-200">
+                    <div class="divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse($dashboardData['recent_activities'] ?? [] as $activity)
                         @php
                             // Handle both object and array data structures for activities
@@ -462,14 +462,14 @@
                                     <div class="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm text-gray-900">{{ $description }}</p>
-                                    <p class="text-xs text-gray-500">{{ $createdAt->diffForHumans() }}</p>
+                                    <p class="text-sm text-gray-900 dark:text-gray-100">{{ $description }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $createdAt->diffForHumans() }}</p>
                                 </div>
                             </div>
                         </div>
                         @empty
                         <div class="px-6 py-4 text-center">
-                            <p class="text-sm text-gray-500">No recent activity</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No recent activity</p>
                         </div>
                         @endforelse
                     </div>
@@ -479,77 +479,77 @@
 
         <!-- Workflow Overview -->
         <div class="mt-8">
-            <div class="bg-white rounded-lg shadow-sm border">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Thesis Workflow Overview</h3>
-                    <p class="text-sm text-gray-500">Current status of the thesis review process</p>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Thesis Workflow Overview</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Current status of the thesis review process</p>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <!-- Proposal Form -->
                         <div class="text-center">
-                            <div class="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-2">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 mx-auto bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-gray-900">Proposal</p>
-                            <p class="text-xs text-gray-500">Form Review</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Proposal</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Form Review</p>
                         </div>
 
                         <!-- Approval Sheet -->
                         <div class="text-center">
-                            <div class="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 mx-auto bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-gray-900">Approval</p>
-                            <p class="text-xs text-gray-500">Sheet Review</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Approval</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Sheet Review</p>
                         </div>
 
                         <!-- Panel Assignment -->
                         <div class="text-center">
-                            <div class="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-2">
-                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 mx-auto bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-gray-900">Panel</p>
-                            <p class="text-xs text-gray-500">Assignment</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Panel</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Assignment</p>
                         </div>
 
                         <!-- Proposal Defense -->
                         <div class="text-center">
-                            <div class="w-12 h-12 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-2">
-                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 mx-auto bg-yellow-100 dark:bg-yellow-800 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-gray-900">Proposal</p>
-                            <p class="text-xs text-gray-500">Defense</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Proposal</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Defense</p>
                         </div>
 
                         <!-- Final Manuscript -->
                         <div class="text-center">
-                            <div class="w-12 h-12 mx-auto bg-indigo-100 rounded-full flex items-center justify-center mb-2">
-                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 mx-auto bg-indigo-100 dark:bg-indigo-800 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-gray-900">Final</p>
-                            <p class="text-xs text-gray-500">Manuscript</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Final</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Manuscript</p>
                         </div>
 
                         <!-- Final Defense -->
                         <div class="text-center">
-                            <div class="w-12 h-12 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-2">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 mx-auto bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-gray-900">Final</p>
-                            <p class="text-xs text-gray-500">Defense</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Final</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Defense</p>
                         </div>
                     </div>
                 </div>

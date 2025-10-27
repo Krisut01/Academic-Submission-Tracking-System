@@ -959,6 +959,20 @@ class ThesisDocumentController extends Controller
      */
     private function createPanelAssignmentAndNotify(ThesisDocument $thesisDocument): void
     {
+        // Check if panel assignment already exists for this student
+        $existingPanelAssignment = \App\Models\PanelAssignment::where('student_id', $thesisDocument->user_id)
+            ->where('thesis_document_id', $thesisDocument->id)
+            ->first();
+            
+        if ($existingPanelAssignment) {
+            Log::info('Panel assignment already exists for this student and document', [
+                'thesis_id' => $thesisDocument->id,
+                'student_id' => $thesisDocument->user_id,
+                'existing_panel_id' => $existingPanelAssignment->id,
+            ]);
+            return;
+        }
+
         // Extract panel members from the thesis document
         $panelMembers = $thesisDocument->panel_members ?? [];
         $panelChairId = $thesisDocument->document_metadata['panel_chair_id'] ?? null;
