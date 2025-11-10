@@ -238,7 +238,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                         'instructions' => $relevantDefense->defense_instructions,
                         'assignment_id' => $relevantDefense->id,
                         'is_upcoming' => $relevantDefense->defense_date > now(),
-                        'days_until' => $relevantDefense->defense_date > now() ? $relevantDefense->defense_date->diffInDays(now()) : 0
+                        'days_until' => $relevantDefense->defense_date > now() ? (int) now()->diffInDays($relevantDefense->defense_date, false) : 0
                     ];
                 }
             }

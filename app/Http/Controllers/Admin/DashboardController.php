@@ -149,6 +149,33 @@ class DashboardController extends Controller
             $newUsersThisWeek = User::where('created_at', '>=', $currentWeek)->count();
             $activeUsersToday = User::where('updated_at', '>=', now()->startOfDay())->count();
             
+            // Get recent unread notifications for admin
+            $recentNotifications = Notification::where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+            
+            // Get notification counts
+            $unreadNotifications = Notification::where('user_id', Auth::id())
+                ->where('is_read', false)
+                ->count();
+                
+            // Get pending items that need admin attention
+            $pendingPanelRequests = ThesisDocument::where('document_type', 'panel_assignment')
+                ->where('status', 'pending')
+                ->count();
+            
+            $pendingForms = AcademicForm::where('status', 'pending')->count();
+            
+            // Get upcoming defenses (next 7 days)
+            $upcomingDefenseList = PanelAssignment::with(['student', 'panelChair'])
+                ->where('status', 'scheduled')
+                ->where('defense_date', '>=', now())
+                ->where('defense_date', '<=', now()->addDays(7))
+                ->orderBy('defense_date', 'asc')
+                ->take(5)
+                ->get();
+            
             return [
                 'total_submissions' => $totalSubmissions,
                 'submissions_this_week' => $submissionsThisWeek,
@@ -176,6 +203,10 @@ class DashboardController extends Controller
                 'under_review_evaluation_forms' => $underReviewEvaluationForms,
                 'approved_evaluation_forms' => $approvedEvaluationForms,
                 'recent_evaluation_forms' => $recentEvaluationForms,
+                'recent_notifications' => $recentNotifications,
+                'unread_notifications' => $unreadNotifications,
+                'pending_panel_requests' => $pendingPanelRequests,
+                'upcoming_defense_list' => $upcomingDefenseList,
             ];
             
         } catch (\Exception $e) {
@@ -207,6 +238,10 @@ class DashboardController extends Controller
                 'under_review_evaluation_forms' => 0,
                 'approved_evaluation_forms' => 0,
                 'recent_evaluation_forms' => collect(),
+                'recent_notifications' => collect(),
+                'unread_notifications' => 0,
+                'pending_panel_requests' => 0,
+                'upcoming_defense_list' => collect(),
             ];
         }
     }

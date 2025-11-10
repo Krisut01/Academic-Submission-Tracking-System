@@ -13,11 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Use comprehensive seeder for complete system data
         $this->call([
-            RoleBasedUserSeeder::class,
-            FacultySeeder::class,
+            ComprehensiveSystemSeeder::class,
         ]);
     }
 }

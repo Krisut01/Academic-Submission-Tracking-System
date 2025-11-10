@@ -3,7 +3,18 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RMT Generation System - Professional Test Creation Platform</title>
+    <title>Records Management Table (RMT) Generation System</title>
+
+        <!-- Dark Mode: Initialize immediately to prevent flash -->
+        <script>
+            // Run before page renders to prevent white flash
+            (function() {
+                const darkMode = localStorage.getItem('darkMode');
+                if (darkMode === 'true' || (!darkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                }
+            })();
+        </script>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -30,7 +41,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
-                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">RMT Generation System</h1>
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">Records Management Table (RMT) Generation System</h1>
                 </div>
 
                 <!-- Right side: Dark Mode Toggle + Navigation -->
@@ -80,11 +91,11 @@
                     <!-- Content -->
                     <div class="text-center md:text-left">
                         <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6">
-                            Professional Test Creation Made
-                            <span class="text-blue-600">Simple</span>
+                            Centralize Thesis Records
+                            <span class="text-blue-600">With Ease</span>
                         </h2>
                         <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                            Create, manage, and distribute professional examinations with our comprehensive RMT (Registered Medical Technologist) Generation System. Streamline your assessment process with powerful tools designed for educators and professionals.
+                            Manage proposals, defenses, approvals, and clearance documents in a single governed workspace. The RMT Generation System keeps every thesis record synchronized across students, faculty, and administrators.
                         </p>
                         
                         <!-- Features -->
@@ -95,7 +106,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700 dark:text-gray-300">Automated test generation</span>
+                                <span class="text-gray-700 dark:text-gray-300">Structured records for every thesis milestone</span>
                             </div>
                             <div class="flex items-center gap-3 justify-center md:justify-start">
                                 <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
@@ -103,7 +114,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700 dark:text-gray-300">Role-based access control</span>
+                                <span class="text-gray-700 dark:text-gray-300">Role-aligned access and approvals</span>
                             </div>
                             <div class="flex items-center gap-3 justify-center md:justify-start">
                                 <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
@@ -111,7 +122,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700 dark:text-gray-300">Comprehensive analytics</span>
+                                <span class="text-gray-700 dark:text-gray-300">Real-time progress visibility</span>
                             </div>
                         </div>
                     </div>
@@ -152,15 +163,9 @@
                                 <select name="role" id="role" required 
                                         class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                     <option value="">Choose your role...</option>
-                                    <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>
-                                        🎓 Student - Take examinations and view results
-                                    </option>
-                                    <option value="faculty" {{ old('role') == 'faculty' ? 'selected' : '' }}>
-                                        👨‍🏫 Faculty - Create and manage examinations
-                                    </option>
-                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>
-                                        ⚙️ Admin - System administration and oversight
-                                    </option>
+                                    <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
+                                    <option value="faculty" {{ old('role') == 'faculty' ? 'selected' : '' }}>Faculty</option>
+                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                                 </select>
                                 @error('role')
                                     <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -248,11 +253,11 @@
         <section class="py-16 bg-white dark:bg-gray-800">
             <div class="container mx-auto px-4 lg:px-8">
                 <div class="text-center mb-12">
-                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Choose RMT Generation System?</h3>
-                    <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                        Our platform provides everything you need to create, manage, and administer professional medical technology examinations.
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Choose the RMT Generation System?</h3>
+                        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                        Our platform captures every thesis deliverable, keeps reviewers aligned, and maintains a complete audit trail across the academic lifecycle.
                     </p>
-                </div>
+                        </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Feature 1 -->
@@ -262,8 +267,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                         </div>
-                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Smart Test Generation</h4>
-                        <p class="text-gray-600 dark:text-gray-300">Automatically generate professional-grade examinations with customizable difficulty levels and topic coverage.</p>
+                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Unified Record Templates</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Standardized submission layouts for proposals, panel requests, approval sheets, and clearance forms ensure consistency across cohorts.</p>
                     </div>
 
                     <!-- Feature 2 -->
@@ -272,9 +277,9 @@
                             <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                        </div>
-                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Secure Assessment</h4>
-                        <p class="text-gray-600 dark:text-gray-300">Advanced security features ensure the integrity of your examinations with anti-cheating mechanisms.</p>
+                    </div>
+                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Controlled Reviews & Approvals</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Role-driven workflows route submissions to the right reviewers, capture decisions, and enforce revision history.</p>
                     </div>
 
                     <!-- Feature 3 -->
@@ -283,9 +288,9 @@
                             <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
-                        </div>
-                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Analytics & Reporting</h4>
-                        <p class="text-gray-600 dark:text-gray-300">Comprehensive analytics help you understand student performance and improve your teaching methods.</p>
+                    </div>
+                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Progress Dashboards</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Visualize thesis progress, defense outcomes, and clearance readiness to keep every stakeholder informed.</p>
                     </div>
                 </div>
             </div>
@@ -293,20 +298,20 @@
             </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-900 dark:text-white py-8">
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-8">
         <div class="container mx-auto px-4 lg:px-8">
             <div class="text-center">
                 <div class="flex items-center justify-center gap-3 mb-4">
                     <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold">RMT Generation System</h3>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Records Management Table (RMT) Generation System</h3>
                 </div>
-                <p class="text-gray-400 mb-4">Professional Test Creation Platform for Medical Technology Education</p>
-                <div class="border-t border-gray-700 pt-4">
-                    <p class="text-sm text-gray-500">© {{ date('Y') }} RMT Generation System. All rights reserved.</p>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Centralized thesis records with governed workflows and audit-ready reporting.</p>
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">© {{ date('Y') }} Records Management Table (RMT) Generation System. All rights reserved.</p>
                 </div>
             </div>
         </div>
@@ -325,18 +330,6 @@ function toggleDarkMode() {
         localStorage.setItem('darkMode', 'true');
     }
 }
-
-// Initialize dark mode on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const darkMode = localStorage.getItem('darkMode');
-    const html = document.documentElement;
-    
-    if (darkMode === 'true' || (!darkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        html.classList.add('dark');
-    } else {
-        html.classList.remove('dark');
-    }
-});
 </script>
 </body>
 </html>

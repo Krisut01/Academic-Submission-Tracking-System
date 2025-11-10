@@ -277,6 +277,122 @@
 
                         <!-- Sidebar -->
                         <div class="space-y-6">
+                            <!-- Recent Notifications -->
+                            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <div class="p-1 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                                            <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                            </svg>
+                                        </div>
+                                        Notifications
+                                        @if(($dashboardData['unread_notifications'] ?? 0) > 0)
+                                            <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                                                {{ $dashboardData['unread_notifications'] }}
+                                            </span>
+                                        @endif
+                                    </h3>
+                                    <a href="{{ route('notifications.index') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                                        View All
+                                    </a>
+                                </div>
+
+                                @if(isset($dashboardData['recent_notifications']) && $dashboardData['recent_notifications']->count() > 0)
+                                    <div class="space-y-3 max-h-96 overflow-y-auto">
+                                        @foreach($dashboardData['recent_notifications']->take(5) as $notification)
+                                            @if(!$notification->is_read)
+                                                <div class="p-4 rounded-xl border bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800 hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-start gap-3">
+                                                        <div class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex-shrink-0">
+                                                            @if($notification->type === 'form_submitted')
+                                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                                </svg>
+                                                            @elseif($notification->type === 'thesis_submitted')
+                                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                                                </svg>
+                                                            @else
+                                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                </svg>
+                                                            @endif
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                                                {{ $notification->title }}
+                                                            </p>
+                                                            <p class="text-xs text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
+                                                                {{ $notification->message }}
+                                                            </p>
+                                                            <div class="flex items-center justify-between">
+                                                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                                    {{ $notification->created_at->diffForHumans() }}
+                                                                </span>
+                                                                @if(isset($notification->data['url']))
+                                                                    <a href="{{ $notification->data['url'] }}" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                                                                        View Details →
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-start gap-3">
+                                                        <div class="p-2 bg-gray-200 dark:bg-gray-600 rounded-lg flex-shrink-0">
+                                                            @if($notification->type === 'form_submitted')
+                                                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                                </svg>
+                                                            @elseif($notification->type === 'thesis_submitted')
+                                                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.168 18.477 18.754 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                                                </svg>
+                                                            @else
+                                                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                </svg>
+                                                            @endif
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                                                {{ $notification->title }}
+                                                            </p>
+                                                            <p class="text-xs text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
+                                                                {{ $notification->message }}
+                                                            </p>
+                                                            <div class="flex items-center justify-between">
+                                                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                                    {{ $notification->created_at->diffForHumans() }}
+                                                                </span>
+                                                                @if(isset($notification->data['url']))
+                                                                    <a href="{{ $notification->data['url'] }}" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                                                                        View Details →
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-center py-8">
+                                        <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                            </svg>
+                                        </div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">No notifications</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">You're all caught up!</p>
+                                    </div>
+                                @endif
+                            </div>
+
                             <!-- Quick Admin Actions -->
                             <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">

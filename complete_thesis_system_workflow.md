@@ -42,7 +42,7 @@ graph TD
     T -->|Approved| U[Submit Clearance Form]
     T -->|Rejected/Revision| S
     U --> V{Admin Review Clearance}
-    V -->|Approved| W[Graduation Complete ✅]
+    V -->|Approved| W[Completed ✅]
     V -->|Rejected/Revision| U
     
     %% Re-defense Scenarios (Right Side)
