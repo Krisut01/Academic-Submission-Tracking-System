@@ -5,7 +5,7 @@ flowchart LR
     subgraph Stakeholders
         A[Student]
         B[Faculty Adviser & Panel]
-        C[Admin & Program Chair]
+        C[Admin & Program Chair]w
     end
 
     subgraph CoreWorkflow[Core Thesis Workflow]

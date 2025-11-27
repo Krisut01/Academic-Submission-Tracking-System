@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\AcademicForm;
 use App\Models\ThesisDocument;
@@ -22,19 +23,19 @@ class ComprehensiveSystemSeeder extends Seeder
         $this->command->info('Clearing existing data...');
         
         // Disable foreign key checks
-        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         
         Notification::truncate();
-        \DB::table('panel_evaluations')->truncate();
-        \DB::table('panel_assignment_reviews')->truncate();
+        DB::table('panel_evaluations')->truncate();
+        DB::table('panel_assignment_reviews')->truncate();
         PanelAssignment::truncate();
         ThesisDocument::truncate();
         AcademicForm::truncate();
-        \DB::table('activity_logs')->truncate();
+        DB::table('activity_logs')->truncate();
         User::truncate();
         
         // Re-enable foreign key checks
-        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->command->info('Starting comprehensive seeding...');
 

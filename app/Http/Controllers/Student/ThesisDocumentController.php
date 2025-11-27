@@ -117,7 +117,7 @@ class ThesisDocumentController extends Controller
         $documentType = $request->get('type', 'proposal');
 
         // Validate document type
-        if (!in_array($documentType, ['proposal', 'approval_sheet', 'panel_assignment', 'final_manuscript'])) {
+        if (!in_array($documentType, ['proposal', 'approval_sheet', 'panel_assignment', 'final_manuscript', 'evaluation_form'])) {
             return redirect()->route('student.thesis.index')
                 ->with('error', 'Invalid document type selected.');
         }
